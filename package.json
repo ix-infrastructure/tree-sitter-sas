@@ -1,5 +1,5 @@
 {
-  "name": "tree-sitter-tree-sitter-sas",
+  "name": "tree-sitter-sas",
   "version": "0.1.0",
   "description": "SAS language grammar for tree-sitter",
   "type": "module",
@@ -20,7 +20,7 @@
     "incremental",
     "parsing",
     "tree-sitter",
-    "tree_sitter_sas"
+    "sas"
   ],
   "files": [
     "grammar.js",

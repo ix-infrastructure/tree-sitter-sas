@@ -8,7 +8,7 @@
 // @ts-check
 
 export default grammar({
-  name: "tree_sitter_sas",
+  name: "sas",
 
   rules: {
     // TODO: add the actual grammar rules

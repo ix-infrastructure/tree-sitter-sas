@@ -1,5 +1,5 @@
 [package]
-name = "tree-sitter-tree-sitter-sas"
+name = "tree-sitter-sas"
 description = "SAS language grammar for tree-sitter"
 version = "0.1.0"
 authors = ["Brandon Garate <bgarate@ix-infra.com>"]

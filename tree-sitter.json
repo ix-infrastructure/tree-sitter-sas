@@ -2,15 +2,15 @@
   "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
   "grammars": [
     {
-      "name": "tree_sitter_sas",
+      "name": "sas",
       "camelcase": "TreeSitterSas",
       "title": "SAS",
       "scope": "source.sas",
       "file-types": [
         "sas"
       ],
-      "injection-regex": "^tree_sitter_sas$",
-      "class-name": "TreeSitterTreeSitterSas"
+      "injection-regex": "^sas$",
+      "class-name": "TreeSitterSas"
     }
   ],
   "metadata": {

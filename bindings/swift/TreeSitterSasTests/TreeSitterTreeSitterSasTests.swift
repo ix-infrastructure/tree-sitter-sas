@@ -1,11 +1,11 @@
 import XCTest
 import SwiftTreeSitter
-import TreeSitterTreeSitterSas
+import TreeSitterSas
 
-final class TreeSitterTreeSitterSasTests: XCTestCase {
+final class TreeSitterSasTests: XCTestCase {
     func testCanLoadGrammar() throws {
         let parser = Parser()
-        let language = Language(language: tree_sitter_tree_sitter_sas())
+        let language = Language(language: tree_sitter_sas())
         XCTAssertNoThrow(try parser.setLanguage(language),
                          "Error loading SAS grammar")
     }

@@ -25,7 +25,7 @@ type NodeInfo =
  *
  * @example
  * import Parser from "tree-sitter";
- * import TreeSitterSas from "tree-sitter-tree-sitter-sas";
+ * import TreeSitterSas from "tree-sitter-sas";
  *
  * const parser = new Parser();
  * parser.setLanguage(TreeSitterSas);
