@@ -1,0 +1,63 @@
+==================
+Simple proc step
+==================
+
+proc means;
+run;
+
+---
+
+(program
+  (proc_step
+    (proc_step_header
+      name: (identifier))
+    (run_or_quit_statement)))
+
+==================
+Proc step with options
+==================
+
+proc sort data=mydata out=sorted;
+  by x;
+run;
+
+---
+
+(program
+  (proc_step
+    (proc_step_header
+      name: (identifier))
+    (generic_statement)
+    (run_or_quit_statement)))
+
+==================
+Proc step with two-level dataset names
+==================
+
+proc means data=mylib.scores;
+run;
+
+---
+
+(program
+  (proc_step
+    (proc_step_header
+      name: (identifier))
+    (run_or_quit_statement)))
+
+==================
+Proc step quit terminator
+==================
+
+proc sql;
+  select 1;
+quit;
+
+---
+
+(program
+  (proc_step
+    (proc_step_header
+      name: (identifier))
+    (generic_statement)
+    (run_or_quit_statement)))

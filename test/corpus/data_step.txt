@@ -1,0 +1,87 @@
+==================
+Simple data step
+==================
+
+data mydata;
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier)))
+    (run_statement)))
+
+==================
+Data step with body
+==================
+
+data work.scores;
+  set mylib.raw;
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier)
+        (identifier)))
+    (generic_statement)
+    (run_statement)))
+
+==================
+Data step null output
+==================
+
+data _null_;
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier)))
+    (run_statement)))
+
+==================
+Data step multiple outputs
+==================
+
+data out1 out2;
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier))
+      (dataset_name
+        (identifier)))
+    (run_statement)))
+
+==================
+Data step with macro variable assignment in body
+==================
+
+data mydata;
+  %let n = 10;
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier)))
+    (macro_variable_assignment
+      name: (identifier))
+    (run_statement)))

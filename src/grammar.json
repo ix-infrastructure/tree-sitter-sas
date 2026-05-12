@@ -75,6 +75,26 @@
         ]
       }
     },
+    "percent_comment": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "%*"
+          },
+          {
+            "type": "PATTERN",
+            "value": "[^;]*"
+          },
+          {
+            "type": "STRING",
+            "value": ";"
+          }
+        ]
+      }
+    },
     "line_comment": {
       "type": "TOKEN",
       "content": {
@@ -324,15 +344,15 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "macro_definition"
+        },
+        {
+          "type": "SYMBOL",
           "name": "macro_variable_assignment"
         },
         {
           "type": "SYMBOL",
           "name": "include_statement"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "libname_statement"
         },
         {
           "type": "SYMBOL",
@@ -352,14 +372,19 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "%"
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
+          "type": "TOKEN",
           "content": {
-            "type": "PATTERN",
-            "value": "[mM][aA][cC][rR][oO]"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "%"
+              },
+              {
+                "type": "PATTERN",
+                "value": "[mM][aA][cC][rR][oO]"
+              }
+            ]
           }
         },
         {
@@ -497,6 +522,10 @@
             "name": "macro_variable_ref"
           },
           {
+            "type": "SYMBOL",
+            "name": "macro_call"
+          },
+          {
             "type": "PATTERN",
             "value": "[^,);\\s]+"
           }
@@ -544,14 +573,19 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "%"
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
+          "type": "TOKEN",
           "content": {
-            "type": "PATTERN",
-            "value": "[mM][eE][nN][dD]"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "%"
+              },
+              {
+                "type": "PATTERN",
+                "value": "[mM][eE][nN][dD]"
+              }
+            ]
           }
         },
         {
@@ -603,17 +637,39 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "macro_arguments"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "macro_arguments"
+                },
+                {
+                  "type": "STRING",
+                  "value": ";"
+                }
+              ]
             },
             {
-              "type": "BLANK"
+              "type": "STRING",
+              "value": ";"
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "REPEAT1",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_mc_tok"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": ";"
+                }
+              ]
             }
           ]
-        },
-        {
-          "type": "STRING",
-          "value": ";"
         }
       ]
     },
@@ -724,18 +780,44 @@
         ]
       }
     },
+    "_mc_tok": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "string_literal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^;%()\\s\"'&]+"
+        }
+      ]
+    },
     "macro_variable_assignment": {
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "%"
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
+          "type": "TOKEN",
           "content": {
-            "type": "PATTERN",
-            "value": "[lL][eE][tT]"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "%"
+              },
+              {
+                "type": "PATTERN",
+                "value": "[lL][eE][tT]"
+              }
+            ]
           }
         },
         {
@@ -800,14 +882,19 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "%"
-        },
-        {
-          "type": "IMMEDIATE_TOKEN",
+          "type": "TOKEN",
           "content": {
-            "type": "PATTERN",
-            "value": "[iI][nN][cC][lL][uU][dD][eE]"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "%"
+              },
+              {
+                "type": "PATTERN",
+                "value": "[iI][nN][cC][lL][uU][dD][eE]"
+              }
+            ]
           }
         },
         {
@@ -871,10 +958,6 @@
           "name": "macro_variable_ref"
         },
         {
-          "type": "SYMBOL",
-          "name": "macro_call"
-        },
-        {
           "type": "PATTERN",
           "value": "[^;\\s\"'&%]+"
         }
@@ -908,10 +991,6 @@
           "name": "macro_variable_ref"
         },
         {
-          "type": "SYMBOL",
-          "name": "macro_call"
-        },
-        {
           "type": "PATTERN",
           "value": "[^;\\/\\s\"'&%]+"
         },
@@ -925,7 +1004,28 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "REPEAT1",
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "string_literal"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "macro_variable_ref"
+            },
+            {
+              "type": "PATTERN",
+              "value": "[^;%\\/\\s\"'&]+"
+            },
+            {
+              "type": "PATTERN",
+              "value": "\\/"
+            }
+          ]
+        },
+        {
+          "type": "REPEAT",
           "content": {
             "type": "CHOICE",
             "members": [
@@ -938,12 +1038,8 @@
                 "name": "macro_variable_ref"
               },
               {
-                "type": "SYMBOL",
-                "name": "macro_call"
-              },
-              {
                 "type": "PATTERN",
-                "value": "[^;\\/\\s\"'&%]+"
+                "value": "[^;%\\/\\s\"'&]+"
               },
               {
                 "type": "PATTERN",
@@ -1108,14 +1204,13 @@
     {
       "type": "SYMBOL",
       "name": "block_comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "percent_comment"
     }
   ],
-  "conflicts": [
-    [
-      "macro_call_statement",
-      "macro_call"
-    ]
-  ],
+  "conflicts": [],
   "precedences": [],
   "externals": [],
   "inline": [],

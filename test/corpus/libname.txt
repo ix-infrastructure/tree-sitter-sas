@@ -1,0 +1,54 @@
+==================
+Libname with path
+==================
+
+libname mylib '/data/my_data';
+
+---
+
+(program
+  (libname_statement
+    libref: (identifier)
+    (string_literal)))
+
+==================
+Libname with engine and path
+==================
+
+libname mylib oracle '/data/oracle_path';
+
+---
+
+(program
+  (libname_statement
+    libref: (identifier)
+    (string_literal)))
+
+==================
+Libname clear
+==================
+
+libname mylib clear;
+
+---
+
+(program
+  (libname_statement
+    libref: (identifier)))
+
+==================
+Multiple libname statements
+==================
+
+libname raw '/data/raw';
+libname out '/data/output';
+
+---
+
+(program
+  (libname_statement
+    libref: (identifier)
+    (string_literal))
+  (libname_statement
+    libref: (identifier)
+    (string_literal)))

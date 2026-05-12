@@ -1,0 +1,235 @@
+==================
+Macro definition no parameters
+==================
+
+%macro setup;
+  %let env = prod;
+%mend setup;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_variable_assignment
+      name: (identifier))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with parameters
+==================
+
+%macro greet(name, title);
+%mend greet;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters
+      (identifier)
+      (identifier))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with default parameter
+==================
+
+%macro greet(name, greeting=Hello);
+%mend;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters
+      (identifier)
+      (identifier))
+    (macro_end)))
+
+==================
+Macro call no arguments
+==================
+
+%setup;
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)))
+
+==================
+Macro call with arguments
+==================
+
+%greet(World, Hi);
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)
+    (macro_arguments)))
+
+==================
+Macro variable assignment
+==================
+
+%let myvar = hello world;
+
+---
+
+(program
+  (macro_variable_assignment
+    name: (identifier)))
+
+==================
+Macro variable assignment empty value
+==================
+
+%let myvar = ;
+
+---
+
+(program
+  (macro_variable_assignment
+    name: (identifier)))
+
+==================
+Include statement
+==================
+
+%include 'myfile.sas';
+
+---
+
+(program
+  (include_statement
+    source: (string_literal)))
+
+==================
+Macro variable reference
+==================
+
+%let path = &base_path/data;
+
+---
+
+(program
+  (macro_variable_assignment
+    name: (identifier)))
+
+==================
+Percent comment
+==================
+
+%* this is a macro comment;
+
+---
+
+(program
+  (percent_comment))
+
+==================
+Percent comment is an extra
+==================
+
+libname a '/p';
+%* comment between statements;
+libname b '/q';
+
+---
+
+(program
+  (libname_statement
+    libref: (identifier)
+    (string_literal))
+  (percent_comment)
+  (libname_statement
+    libref: (identifier)
+    (string_literal)))
+
+==================
+Macro put statement
+==================
+
+%put hello &name.;
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)
+    (macro_variable_ref)))
+
+==================
+Macro do loop header
+==================
+
+%do i = 1 %to &n.;
+%end;
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)
+    (macro_call
+      name: (macro_name))
+    (macro_variable_ref))
+  (macro_call_statement
+    name: (macro_name)))
+
+==================
+Macro if then do
+==================
+
+%if &x = 1 %then %do;
+%end;
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)
+    (macro_variable_ref)
+    (macro_call
+      name: (macro_name))
+    (macro_call
+      name: (macro_name)))
+  (macro_call_statement
+    name: (macro_name)))
+
+==================
+Macro global statement
+==================
+
+%global myvar;
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)))
+
+==================
+Macro global multiple variables
+==================
+
+%global a b c;
+
+---
+
+(program
+  (macro_call_statement
+    name: (macro_name)))

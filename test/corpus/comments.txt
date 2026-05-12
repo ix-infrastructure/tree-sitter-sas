@@ -1,0 +1,63 @@
+==================
+Block comment
+==================
+
+/* this is a block comment */
+
+---
+
+(program
+  (block_comment))
+
+==================
+Line comment
+==================
+
+* this is a line comment;
+
+---
+
+(program
+  (line_comment))
+
+==================
+Multiline line comment
+==================
+
+* this comment
+  spans multiple lines;
+
+---
+
+(program
+  (line_comment))
+
+==================
+Empty line comment
+==================
+
+*;
+
+---
+
+(program
+  (line_comment))
+
+==================
+Block comment between statements
+==================
+
+libname a '/p1';
+/* comment between statements */
+libname b '/p2';
+
+---
+
+(program
+  (libname_statement
+    libref: (identifier)
+    (string_literal))
+  (block_comment)
+  (libname_statement
+    libref: (identifier)
+    (string_literal)))
