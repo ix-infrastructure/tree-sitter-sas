@@ -1,12 +1,606 @@
 [
   {
-    "type": "source_file",
+    "type": "data_step",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "data_step_header",
+          "named": true
+        },
+        {
+          "type": "generic_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "libname_statement",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "macro_call_statement",
+          "named": true
+        },
+        {
+          "type": "macro_variable_assignment",
+          "named": true
+        },
+        {
+          "type": "run_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "data_step_header",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "dataset_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "dataset_name",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "generic_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "include_statement",
+    "named": true,
+    "fields": {
+      "source": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_literal",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "libname_statement",
+    "named": true,
+    "fields": {
+      "libref": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_arguments",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_call",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "macro_name",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_arguments",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_call_statement",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "macro_name",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_arguments",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_definition",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "macro_name",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "data_step",
+          "named": true
+        },
+        {
+          "type": "generic_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "macro_call_statement",
+          "named": true
+        },
+        {
+          "type": "macro_definition",
+          "named": true
+        },
+        {
+          "type": "macro_end",
+          "named": true
+        },
+        {
+          "type": "macro_parameters",
+          "named": true
+        },
+        {
+          "type": "macro_variable_assignment",
+          "named": true
+        },
+        {
+          "type": "proc_step",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_end",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_name",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_parameters",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_variable_assignment",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "macro_call",
+            "named": true
+          },
+          {
+            "type": "macro_variable_ref",
+            "named": true
+          },
+          {
+            "type": "string_literal",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "options_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "proc_step",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "generic_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "libname_statement",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "macro_call_statement",
+          "named": true
+        },
+        {
+          "type": "macro_variable_assignment",
+          "named": true
+        },
+        {
+          "type": "proc_step_header",
+          "named": true
+        },
+        {
+          "type": "run_or_quit_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "proc_step_header",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "program",
     "named": true,
     "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "data_step",
+          "named": true
+        },
+        {
+          "type": "generic_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "libname_statement",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "macro_call_statement",
+          "named": true
+        },
+        {
+          "type": "macro_definition",
+          "named": true
+        },
+        {
+          "type": "macro_variable_assignment",
+          "named": true
+        },
+        {
+          "type": "options_statement",
+          "named": true
+        },
+        {
+          "type": "proc_step",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "run_or_quit_statement",
+    "named": true,
     "fields": {}
   },
   {
-    "type": "hello",
+    "type": "run_statement",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "string_literal",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "\"",
     "named": false
+  },
+  {
+    "type": "\"\"",
+    "named": false
+  },
+  {
+    "type": "%",
+    "named": false
+  },
+  {
+    "type": "'",
+    "named": false
+  },
+  {
+    "type": "''",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": ",",
+    "named": false
+  },
+  {
+    "type": ".",
+    "named": false
+  },
+  {
+    "type": ";",
+    "named": false
+  },
+  {
+    "type": "=",
+    "named": false
+  },
+  {
+    "type": "block_comment",
+    "named": true,
+    "extra": true
+  },
+  {
+    "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "line_comment",
+    "named": true
+  },
+  {
+    "type": "macro_variable_ref",
+    "named": true
   }
 ]
