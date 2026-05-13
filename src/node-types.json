@@ -36,6 +36,10 @@
           "named": true
         },
         {
+          "type": "null_statement",
+          "named": true
+        },
+        {
           "type": "run_statement",
           "named": true
         }
@@ -68,6 +72,10 @@
         {
           "type": "identifier",
           "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
         }
       ]
     }
@@ -80,6 +88,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
         {
           "type": "macro_variable_ref",
           "named": true
@@ -112,6 +124,10 @@
       "types": [
         {
           "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
           "named": true
         }
       ]
@@ -290,6 +306,10 @@
           "named": true
         },
         {
+          "type": "null_statement",
+          "named": true
+        },
+        {
           "type": "proc_step",
           "named": true
         }
@@ -358,11 +378,15 @@
     "named": true,
     "fields": {
       "name": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "macro_variable_ref",
             "named": true
           }
         ]
@@ -388,6 +412,11 @@
     }
   },
   {
+    "type": "null_statement",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "options_statement",
     "named": true,
     "fields": {},
@@ -397,6 +426,10 @@
       "types": [
         {
           "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
           "named": true
         }
       ]
@@ -435,6 +468,10 @@
           "named": true
         },
         {
+          "type": "null_statement",
+          "named": true
+        },
+        {
           "type": "proc_step_header",
           "named": true
         },
@@ -466,6 +503,10 @@
       "types": [
         {
           "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
           "named": true
         }
       ]

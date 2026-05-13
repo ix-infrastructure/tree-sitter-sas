@@ -14,16 +14,22 @@ function kw(word) {
   );
 }
 
-// Single lexer token for "%KEYWORD" — beats the 1-char "%" used by macro_call
-// on length, so the lexer always picks the correct rule.
-// Known limitation: macros whose names start with a reserved keyword prefix
-// (e.g. %let2, %macroFoo) will not parse correctly. Extremely rare in practice.
-function percentKw(word) {
-  return token(seq("%", kw(word)));
-}
+// %KEYWORD disambiguation is handled by an external scanner (src/scanner.c).
+// The scanner emits the $._pct_* tokens only when the keyword is NOT immediately
+// followed by an identifier character — so %letput, %macroFoo, etc. fall through
+// to macro_call_statement's plain "%" + identifier path instead.
 
 export default grammar({
   name: "sas",
+
+  // External tokens produced by src/scanner.c.
+  // Each matches its %KEYWORD only when followed by a non-identifier character.
+  externals: $ => [
+    $._pct_let,      // %let
+    $._pct_macro,    // %macro
+    $._pct_mend,     // %mend
+    $._pct_include,  // %include
+  ],
 
   extras: $ => [
     /\s+/,
@@ -61,7 +67,6 @@ export default grammar({
     )),
 
     // %* text ; — SAS macro language comment; an extra like block_comment
-    // The %* combined token (2 chars) beats the 1-char % used by macro rules.
     percent_comment: $ => token(seq("%*", /[^;]*/, ";")),
 
     // * text ; — single token so the lexer beats generic_statement on `*`
@@ -87,13 +92,21 @@ export default grammar({
     ),
 
     dataset_name: $ => choice(
-      seq($.identifier, ".", $.identifier),
+      seq($._dname_part, ".", $._dname_part),
       alias(
         token(choice("_NULL_", "_null_", "_DATA_", "_data_", "_LAST_", "_last_")),
         $.identifier
       ),
-      $.identifier,
+      $._dname_part,
     ),
+
+    // Dataset name part: identifier or macro ref, optionally followed by more macro refs.
+    // Handles _w_&&memname&d, work.&&data&d, &&libname&d, etc.
+    // prec.right: greedily consume consecutive macro_variable_refs into one part.
+    _dname_part: $ => prec.right(seq(
+      choice($.identifier, $.macro_variable_ref),
+      repeat($.macro_variable_ref),
+    )),
 
     // ── PROC step ─────────────────────────────────────────────────────────
 
@@ -122,13 +135,19 @@ export default grammar({
       $.include_statement,
       $.macro_call_statement,
       $.line_comment,
+      $.null_statement,
       $.generic_statement,
     ),
+
+    // Standalone semicolon — valid as a null/empty statement in SAS step bodies
+    // and macro bodies (common after %if/%else blocks that span multiple lines).
+    // prec(-1) makes it lose to macro_call_statement's optional ";" when ambiguous.
+    null_statement: $ => prec(-1, ";"),
 
     // ── Macro definition ──────────────────────────────────────────────────
 
     macro_definition: $ => seq(
-      percentKw("MACRO"),
+      $._pct_macro,
       field("name", $.macro_name),
       optional($.macro_parameters),
       ";",
@@ -165,11 +184,12 @@ export default grammar({
       $.include_statement,
       $.macro_call_statement,
       $.line_comment,
+      $.null_statement,
       $.generic_statement,
     ),
 
     macro_end: $ => seq(
-      percentKw("MEND"),
+      $._pct_mend,
       optional($.macro_name),
       ";",
     ),
@@ -181,41 +201,65 @@ export default grammar({
     // Standalone statement: %name(args);   %name;   %name content;
     // The third form handles SAS built-ins that take non-parenthesized content:
     //   %put text;   %do i = 1 %to &n;   %if cond %then stmt;   %global x y;
+    // prec.right on option 1: prefer consuming the trailing ";" into this rule
+    // rather than leaving it as a null_statement.
     macro_call_statement: $ => seq(
       "%",
       field("name", alias(token.immediate(/[A-Za-z_][A-Za-z0-9_]*/), $.macro_name)),
       choice(
-        seq($.macro_arguments, ";"),            // %name(args);
-        ";",                                    // %name;
-        seq(repeat1($._mc_tok), ";"),           // %name content; (non-parenthesized)
+        prec.right(seq($.macro_arguments, optional(";"))), // %name(args); or %name(args)
+        ";",                                               // %name;
+        seq(repeat1($._mc_tok), ";"),                      // %name content;
       ),
     ),
 
-    // Inline call used as a value inside other constructs
-    macro_call: $ => seq(
+    // Inline call used as a value inside other constructs.
+    // prec.right: when a "(" follows, prefer attaching it as macro_arguments
+    // to this call rather than leaving it for the outer context.
+    macro_call: $ => prec.right(seq(
       "%",
       field("name", alias(token.immediate(/[A-Za-z_][A-Za-z0-9_]*/), $.macro_name)),
       optional($.macro_arguments),
-    ),
+    )),
 
-    macro_arguments: $ => seq(
+    // prec(1): when "(" immediately follows a macro name, prefer this over
+    // _paren_group so %name(args) always uses macro_arguments.
+    macro_arguments: $ => prec(1, seq(
       "(",
       optional(seq(
         $._macro_arg,
         repeat(seq(",", $._macro_arg)),
       )),
       ")",
-    ),
+    )),
 
     _macro_arg: $ => repeat1(choice(
       $.string_literal,
       $.macro_variable_ref,
       $.macro_call,
-      /[^,();\s]+/,
+      $._paren_group,
+      /[^,();\s"'&%]+/,
     )),
 
+    // Parenthesized group inside a macro argument — handles non-macro function
+    // calls like index(), exist(), scan() that appear as %sysfunc arguments.
+    // Commas inside are allowed (they separate the inner function's own args).
+    _paren_group: $ => seq(
+      "(",
+      repeat($._paren_group_item),
+      ")",
+    ),
+
+    _paren_group_item: $ => choice(
+      $.string_literal,
+      $.macro_variable_ref,
+      $.macro_call,
+      $._paren_group,
+      /[^();"'&%]+/,
+    ),
+
     // Tokens inside non-paren macro statement content (e.g. %put, %do, %if).
-    // Parens excluded from the bare-token pattern so %name(args) uses
+    // Parens excluded from the bare-token pattern: %name( always routes to
     // macro_arguments (option 1 of macro_call_statement) unambiguously.
     _mc_tok: $ => choice(
       $.string_literal,
@@ -227,11 +271,17 @@ export default grammar({
     // ── %LET ──────────────────────────────────────────────────────────────
 
     macro_variable_assignment: $ => seq(
-      percentKw("LET"),
-      field("name", $.identifier),
+      $._pct_let,
+      field("name", $._let_name),
       "=",
       optional(field("value", $._macro_value)),
       ";",
+    ),
+
+    // Name in %let: identifier, or identifier+&refs, or pure &ref (e.g. %let name&i or %let &&var)
+    _let_name: $ => seq(
+      choice($.identifier, $.macro_variable_ref),
+      repeat($.macro_variable_ref),
     ),
 
     _macro_value: $ => repeat1(choice(
@@ -244,7 +294,7 @@ export default grammar({
     // ── %INCLUDE ──────────────────────────────────────────────────────────
 
     include_statement: $ => seq(
-      percentKw("INCLUDE"),
+      $._pct_include,
       field("source", $.string_literal),
       repeat($._option_token),
       ";",
@@ -275,6 +325,7 @@ export default grammar({
     ),
 
     _option_token: $ => choice(
+      $.string_literal,
       $.macro_variable_ref,
       /[^;\/\s"'&%]+/,
       /=\s*/,
@@ -282,9 +333,9 @@ export default grammar({
 
     // ── Generic fallback statement ────────────────────────────────────────
 
-    // Does NOT contain macro_call — all %-prefixed statements go to the
-    // specific macro rules above. This prevents generic_statement from
-    // swallowing %LET / %INCLUDE / etc. before they can be recognised.
+    // First token must be non-% to avoid conflict with macro_call_statement.
+    // Subsequent tokens may include inline macro_call (e.g. %eval, %if, %sysfunc)
+    // so that proc/data statements with embedded macro calls parse cleanly.
     generic_statement: $ => seq(
       choice(
         $.string_literal,
@@ -295,6 +346,7 @@ export default grammar({
       repeat(choice(
         $.string_literal,
         $.macro_variable_ref,
+        $.macro_call,
         /[^;%\/\s"'&]+/,
         /\//,
       )),
