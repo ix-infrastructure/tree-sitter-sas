@@ -1,27 +1,30 @@
-; Macro definitions → definition.function
+; Macro definitions → definition.macro
 (macro_definition
-  name: (macro_name) @name) @definition.function
+  name: (macro_name) @name) @definition.macro
 
-; Macro calls → call
+; Macro call statements → call
 (macro_call_statement
-  name: (macro_name) @name) @call
+  name: (macro_name) @call.name) @call
 
-; DATA step → definition.block
+; Inline macro calls (inside DATA/PROC steps, %let values, etc.)
+(macro_call
+  name: (macro_name) @call.name) @call
+
+; DATA step → definition.module
 (data_step
   (data_step_header
     (dataset_name
-      (identifier) @name))) @definition.block
+      (identifier) @name))) @definition.module
 
-; PROC step → definition.block
+; PROC step → definition.module
 (proc_step
   (proc_step_header
-    name: (identifier) @name)) @definition.block
+    name: (identifier) @name)) @definition.module
 
 ; %INCLUDE → import
 (include_statement
-  source: (string_literal) @name) @import
+  source: (string_literal) @import.source) @import
 
-; LIBNAME → import
+; LIBNAME → import (library path)
 (libname_statement
-  libref: (identifier) @name
   (string_literal) @import.source) @import
