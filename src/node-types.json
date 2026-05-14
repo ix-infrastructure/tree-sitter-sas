@@ -648,8 +648,7 @@
   },
   {
     "type": "block_comment",
-    "named": true,
-    "extra": true
+    "named": true
   },
   {
     "type": "identifier",
@@ -665,7 +664,6 @@
   },
   {
     "type": "percent_comment",
-    "named": true,
-    "extra": true
+    "named": true
   }
 ]
