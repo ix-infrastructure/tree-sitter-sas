@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-sas",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "SAS language grammar for tree-sitter",
   "type": "module",
   "repository": {
@@ -14,8 +14,11 @@
     "email": "bgarate@ix-infra.com",
     "url": "ix-infra.com"
   },
-  "main": "bindings/node",
-  "types": "bindings/node",
+  "main": "bindings/node/index.js",
+  "types": "bindings/node/index.d.ts",
+  "exports": {
+    ".": "./bindings/node/index.js"
+  },
   "keywords": [
     "incremental",
     "parsing",
