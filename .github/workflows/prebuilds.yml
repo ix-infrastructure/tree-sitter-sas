@@ -1,0 +1,75 @@
+name: Prebuilds
+
+# Runs automatically on version tags (v*).
+# Can also be triggered manually via Actions → "Run workflow".
+# The publish job only fires on tags — manual runs produce downloadable
+# artifacts that you can inspect before publishing.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux-x64    }
+          - { os: macos-13,      target: darwin-x64   }
+          - { os: macos-14,      target: darwin-arm64 }
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build native prebuild
+        run: npx prebuildify --napi --strip
+
+      - name: Upload prebuild artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuild-${{ matrix.target }}
+          path: prebuilds/
+
+  publish:
+    name: Publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    # Only publish when triggered by a tag push, not workflow_dispatch
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Download all three platform artifacts into prebuilds/.
+      # merge-multiple flattens them into: prebuilds/linux-x64/, darwin-x64/, darwin-arm64/
+      # which is exactly the structure node-gyp-build expects.
+      - name: Download all prebuilds
+        uses: actions/download-artifact@v4
+        with:
+          path: prebuilds
+          merge-multiple: true
+
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
