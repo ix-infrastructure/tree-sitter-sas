@@ -298,6 +298,10 @@
           "named": true
         },
         {
+          "type": "macro_label",
+          "named": true
+        },
+        {
           "type": "macro_parameters",
           "named": true
         },
@@ -323,6 +327,21 @@
     "children": {
       "multiple": false,
       "required": false,
+      "types": [
+        {
+          "type": "macro_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_label",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
       "types": [
         {
           "type": "macro_name",
@@ -613,6 +632,10 @@
   },
   {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": ":",
     "named": false
   },
   {

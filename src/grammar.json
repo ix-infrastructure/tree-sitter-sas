@@ -590,6 +590,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "macro_label"
+        },
+        {
+          "type": "SYMBOL",
           "name": "line_comment"
         },
         {
@@ -624,6 +628,31 @@
         {
           "type": "STRING",
           "value": ";"
+        }
+      ]
+    },
+    "macro_label": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "%"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "IMMEDIATE_TOKEN",
+            "content": {
+              "type": "PATTERN",
+              "value": "[A-Za-z_][A-Za-z0-9_]*"
+            }
+          },
+          "named": true,
+          "value": "macro_name"
+        },
+        {
+          "type": "STRING",
+          "value": ":"
         }
       ]
     },
@@ -690,10 +719,14 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "REPEAT1",
+                  "type": "SYMBOL",
+                  "name": "_mc_tok"
+                },
+                {
+                  "type": "REPEAT",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "_mc_tok"
+                    "name": "_mc_tok_inner"
                   }
                 },
                 {
@@ -884,6 +917,43 @@
         {
           "type": "SYMBOL",
           "name": "macro_call"
+        },
+        {
+          "type": "PATTERN",
+          "value": "&=[A-Za-z_][A-Za-z0-9_]*"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^;%()\\s\"'&]+"
+        }
+      ]
+    },
+    "_mc_tok_inner": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "string_literal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_paren_group"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_bare_pct"
+        },
+        {
+          "type": "PATTERN",
+          "value": "&=[A-Za-z_][A-Za-z0-9_]*"
         },
         {
           "type": "PATTERN",
@@ -1137,6 +1207,10 @@
                 "name": "macro_call"
               },
               {
+                "type": "SYMBOL",
+                "name": "_bare_pct"
+              },
+              {
                 "type": "PATTERN",
                 "value": "[^;%\\/\\s\"'&]+"
               },
@@ -1160,7 +1234,7 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "&&?"
+            "value": "&+"
           },
           {
             "type": "PATTERN",
@@ -1327,6 +1401,10 @@
     {
       "type": "SYMBOL",
       "name": "_pct_include"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_bare_pct"
     }
   ],
   "inline": [],

@@ -29,6 +29,7 @@ export default grammar({
     $._pct_macro,    // %macro
     $._pct_mend,     // %mend
     $._pct_include,  // %include
+    $._bare_pct,     // bare % not starting a macro call (e.g., width=20%)
   ],
 
   extras: $ => [
@@ -183,6 +184,7 @@ export default grammar({
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
+      $.macro_label,
       $.line_comment,
       $.null_statement,
       $.generic_statement,
@@ -194,6 +196,14 @@ export default grammar({
       ";",
     ),
 
+    // %label: — SAS macro goto label (no semicolon).  Disambiguated from
+    // macro_call_statement via the conflicts declaration + GLR.
+    macro_label: $ => seq(
+      "%",
+      alias(token.immediate(/[A-Za-z_][A-Za-z0-9_]*/), $.macro_name),
+      ":",
+    ),
+
     macro_name: $ => $.identifier,
 
     // ── Macro call ────────────────────────────────────────────────────────
@@ -201,6 +211,10 @@ export default grammar({
     // Standalone statement: %name(args);   %name;   %name content;
     // The third form handles SAS built-ins that take non-parenthesized content:
     //   %put text;   %do i = 1 %to &n;   %if cond %then stmt;   %global x y;
+    // Option 3 splits into a required non-paren first token (_mc_tok) followed by
+    // optional tokens that may include parenthesized groups (_mc_tok_inner).
+    // This ensures option 3 never starts with "(" — eliminating the conflict with
+    // option 1's macro_arguments — while still allowing n(&v) and opt=(...) later.
     // prec.right on option 1: prefer consuming the trailing ";" into this rule
     // rather than leaving it as a null_statement.
     macro_call_statement: $ => seq(
@@ -209,7 +223,7 @@ export default grammar({
       choice(
         prec.right(seq($.macro_arguments, optional(";"))), // %name(args); or %name(args)
         ";",                                               // %name;
-        seq(repeat1($._mc_tok), ";"),                      // %name content;
+        seq($._mc_tok, repeat($._mc_tok_inner), ";"),      // %name content;
       ),
     ),
 
@@ -258,13 +272,26 @@ export default grammar({
       /[^();"'&%]+/,
     ),
 
-    // Tokens inside non-paren macro statement content (e.g. %put, %do, %if).
-    // Parens excluded from the bare-token pattern: %name( always routes to
-    // macro_arguments (option 1 of macro_call_statement) unambiguously.
+    // First token of option-3 macro_call_statement content.  Parens excluded so
+    // the first token never starts with "(" — keeping option 1 (macro_arguments)
+    // unambiguous when "(" follows the macro name.
     _mc_tok: $ => choice(
       $.string_literal,
       $.macro_variable_ref,
       $.macro_call,
+      /&=[A-Za-z_][A-Za-z0-9_]*/,  // %put &=var shorthand
+      /[^;%()\s"'&]+/,
+    ),
+
+    // Subsequent tokens in option-3 content — same as _mc_tok but also allows
+    // parenthesized groups for bare SAS calls like n(&panelby) and opt=(...).
+    _mc_tok_inner: $ => choice(
+      $.string_literal,
+      $.macro_variable_ref,
+      $.macro_call,
+      $._paren_group,
+      $._bare_pct,                  // bare % not starting a macro call
+      /&=[A-Za-z_][A-Za-z0-9_]*/,  // %put &=var shorthand
       /[^;%()\s"'&]+/,
     ),
 
@@ -336,6 +363,7 @@ export default grammar({
     // First token must be non-% to avoid conflict with macro_call_statement.
     // Subsequent tokens may include inline macro_call (e.g. %eval, %if, %sysfunc)
     // so that proc/data statements with embedded macro calls parse cleanly.
+    // _bare_pct handles literal % in ODS style attributes (e.g., width=20%).
     generic_statement: $ => seq(
       choice(
         $.string_literal,
@@ -347,6 +375,7 @@ export default grammar({
         $.string_literal,
         $.macro_variable_ref,
         $.macro_call,
+        $._bare_pct,
         /[^;%\/\s"'&]+/,
         /\//,
       )),
@@ -355,9 +384,9 @@ export default grammar({
 
     // ── Primitives ────────────────────────────────────────────────────────
 
-    // &var or &&var; optional trailing dot is the macro separator
+    // &var, &&var, &&&var, etc.; optional trailing dot is the macro separator
     macro_variable_ref: $ => token(seq(
-      /&&?/,
+      /&+/,
       /[A-Za-z_][A-Za-z0-9_]*/,
       repeat(/\./)
     )),

@@ -8,6 +8,7 @@ enum TokenType {
   PCT_MACRO,
   PCT_MEND,
   PCT_INCLUDE,
+  BARE_PCT,
 };
 
 void *tree_sitter_sas_external_scanner_create(void) { return NULL; }
@@ -64,6 +65,14 @@ bool tree_sitter_sas_external_scanner_scan(
   lexer->advance(lexer, false);  // consume '%'
 
   int32_t c = tolower((unsigned char)lexer->lookahead);
+
+  // Bare % — not followed by an identifier char, so it cannot be a keyword or
+  // macro call trigger.  Exclude '*' to let the internal lexer produce the
+  // percent_comment token (%* text ;) instead.
+  if (valid_symbols[BARE_PCT] && !is_ident_char(c) && c != '*') {
+    lexer->result_symbol = BARE_PCT;
+    return true;
+  }
 
   // ── %let ──────────────────────────────────────────────────────────────────
   if (c == 'l' && valid_symbols[PCT_LET]) {
