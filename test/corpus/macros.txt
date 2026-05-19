@@ -57,6 +57,57 @@ Macro definition with default parameter
     (macro_end)))
 
 ==================
+Macro definition with macro call default parameter
+==================
+
+%macro foo(a, b = %sysfunc(pathname(work)));
+%mend foo;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters
+      (identifier)
+      (identifier)
+      (macro_call
+        name: (macro_name)
+        (macro_arguments)))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with block comments in parameter list
+==================
+
+%macro loadPackage(
+  packageName                         /* name of a package */
+, path = %sysfunc(pathname(packages)) /* location of a package */
+);
+%mend loadPackage;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters
+      (identifier)
+      (block_comment)
+      (identifier)
+      (macro_call
+        name: (macro_name)
+        (macro_arguments))
+      (block_comment))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
 Macro call no arguments
 ==================
 

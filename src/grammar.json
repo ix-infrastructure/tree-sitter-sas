@@ -555,8 +555,12 @@
             "name": "macro_call"
           },
           {
+            "type": "SYMBOL",
+            "name": "_paren_group"
+          },
+          {
             "type": "PATTERN",
-            "value": "[^,);\\s]+"
+            "value": "[^,();\\s\"'&%]+"
           }
         ]
       }

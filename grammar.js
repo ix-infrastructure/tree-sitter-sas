@@ -174,7 +174,8 @@ export default grammar({
       $.string_literal,
       $.macro_variable_ref,
       $.macro_call,
-      /[^,);\s]+/,
+      $._paren_group,
+      /[^,();\s"'&%]+/,
     )),
 
     _macro_body_item: $ => choice(
