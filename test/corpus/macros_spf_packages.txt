@@ -262,3 +262,42 @@ des='help'
     (macro_end
       (macro_name
         (identifier)))))
+
+==================
+Single-quoted string with escaped quote then percent (cats triple-quote pattern)
+==================
+
+data _null_;
+  fileshort2 = cats('''%', y, "()'");
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier)))
+    (generic_statement
+      (string_literal)
+      (string_literal))
+    (run_statement)))
+
+==================
+Double-quoted string with percent-doublequote macro-quoting form
+==================
+
+data _null_;
+  title "Required: %str(%'%")";
+run;
+
+---
+
+(program
+  (data_step
+    (data_step_header
+      (dataset_name
+        (identifier)))
+    (generic_statement
+      (string_literal))
+    (run_statement)))

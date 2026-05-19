@@ -103,6 +103,7 @@ export default grammar({
 
     // Dataset name part: identifier or macro ref, optionally followed by more macro refs.
     // Handles _w_&&memname&d, work.&&data&d, &&libname&d, etc.
+    // &var.addCnt is handled by macro_variable_ref consuming the dot+identifier suffix.
     // prec.right: greedily consume consecutive macro_variable_refs into one part.
     _dname_part: $ => prec.right(seq(
       choice($.identifier, $.macro_variable_ref),
@@ -398,19 +399,37 @@ export default grammar({
 
     // ── Primitives ────────────────────────────────────────────────────────
 
-    // &var, &&var, &&&var, etc.; optional trailing dot is the macro separator
+    // &var, &&var, &&&var, etc.
+    // Each "segment" is an optional dot then an optional identifier — covering:
+    //   &var          (no trailing dot)
+    //   &var.         (macro separator dot, nothing after)
+    //   &var.suffix   (dot + literal text appended to expansion, e.g. &dsname.addCnt)
+    //   &&var.name    (double-amp indirect reference with suffix)
+    // Using choice(dot+ident, dot) with dot+ident first so the longer form wins.
     macro_variable_ref: $ => token(seq(
       /&+/,
       /[A-Za-z_][A-Za-z0-9_]*/,
-      repeat(/\./)
+      repeat(choice(
+        /\.[A-Za-z_][A-Za-z0-9_]*/,
+        /\./,
+      )),
     )),
 
     identifier: $ => /[A-Za-z_][A-Za-z0-9_]*/,
 
-    // Single or double quoted; quote char escaped by doubling
+    // Single or double quoted; quote char escaped by doubling.
+    // The quoted content is wrapped in token() so that block_comment extras
+    // cannot fire inside a string — without token(), a string like
+    // '/*code-block-start##*/' would let the block_comment extra match the
+    // /*...*/ span and consume subsequent source lines as part of the comment.
+    // %" inside double-quoted strings is a SAS macro-quoting form that produces
+    // a literal " character; list it first so the embedded " does not prematurely
+    // close the token.  Single-quoted strings have no such form — '' is the only
+    // escape — so %' is NOT listed; otherwise '''%' would greedily consume the
+    // closing ' as part of the %' sequence and fail to tokenize.
     string_literal: $ => choice(
-      seq("'", repeat(choice(/[^']+/, "''")), "'", optional($._string_suffix)),
-      seq('"', repeat(choice(/[^"]+/, '""')), '"', optional($._string_suffix)),
+      seq(token(seq("'", repeat(choice(/[^']+/, "''")), "'")), optional($._string_suffix)),
+      seq(token(seq('"', repeat(choice(/%"/, /[^"]+/, '""')), '"')), optional($._string_suffix)),
     ),
 
     // Typed constant suffix — must immediately follow closing quote (no space):
