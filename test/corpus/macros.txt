@@ -108,6 +108,127 @@ Macro definition with block comments in parameter list
         (identifier)))))
 
 ==================
+Macro definition with single option keyword
+==================
+
+%macro foo() / secure;
+%mend foo;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters)
+    (macro_options
+      (identifier))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with multiple option keywords
+==================
+
+%MACRO SQL() / PARMBUFF SECURE;
+%mend SQL;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters)
+    (macro_options
+      (identifier)
+      (identifier))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with des= option and multiline params
+==================
+
+%macro listPackages(
+  listDataSet
+, quiet = 0
+)/secure parmbuff
+des = 'Macro to list SAS packages.'
+;
+%mend listPackages;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters
+      (identifier)
+      (identifier))
+    (macro_options
+      (identifier)
+      (identifier)
+      (identifier)
+      (string_literal))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with options split across lines
+==================
+
+%macro bundlePackages(
+)/
+des='Macro to create a bundle.'
+seor
+;
+%mend bundlePackages;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters)
+    (macro_options
+      (identifier)
+      (string_literal)
+      (identifier))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
+Macro definition with options immediately after closing paren
+==================
+
+%macro SPFint_gnPckg_arch()/secure minoperator
+des='Internal macro.';
+%mend SPFint_gnPckg_arch;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name
+      (identifier))
+    (macro_parameters)
+    (macro_options
+      (identifier)
+      (identifier)
+      (identifier)
+      (string_literal))
+    (macro_end
+      (macro_name
+        (identifier)))))
+
+==================
 Macro call no arguments
 ==================
 

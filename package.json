@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-sas",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "SAS language grammar for tree-sitter",
   "type": "module",
   "repository": {

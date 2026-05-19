@@ -151,6 +151,7 @@ export default grammar({
       $._pct_macro,
       field("name", $.macro_name),
       optional($.macro_parameters),
+      optional($.macro_options),
       ";",
       repeat($._macro_body_item),
       $.macro_end,
@@ -195,6 +196,18 @@ export default grammar({
       $._pct_mend,
       optional($.macro_name),
       ";",
+    ),
+
+    // / secure minoperator des='...' — option clause between params and header ;
+    // Extras (/\s+/, block_comment) make multiline option lists transparent.
+    macro_options: $ => seq(
+      "/",
+      repeat($._macro_option_token),
+    ),
+
+    _macro_option_token: $ => choice(
+      seq($.identifier, "=", $.string_literal),  // des='description'
+      $.identifier,                               // secure, minoperator, parmbuff, etc.
     ),
 
     // %label: — SAS macro goto label (no semicolon).  Disambiguated from
