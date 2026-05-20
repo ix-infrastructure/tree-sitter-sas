@@ -1,6 +1,6 @@
 LANGUAGE_NAME := tree-sitter-tree-sitter-sas
 HOMEPAGE_URL := https://github.com/ix-infrastructure/tree-sitter-sas
-VERSION := 0.1.0
+VERSION := 0.3.7
 
 # repository
 SRC_DIR := src

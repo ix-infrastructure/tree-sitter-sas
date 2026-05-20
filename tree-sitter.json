@@ -14,7 +14,7 @@
     }
   ],
   "metadata": {
-    "version": "0.1.0",
+    "version": "0.3.7",
     "license": "MIT",
     "description": "SAS language grammar for tree-sitter",
     "authors": [

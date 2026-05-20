@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-sas
-        VERSION "0.1.0"
+        VERSION "0.3.7"
         DESCRIPTION "SAS language grammar for tree-sitter"
         HOMEPAGE_URL "https://github.com/ix-infrastructure/tree-sitter-sas"
         LANGUAGES C)
