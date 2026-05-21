@@ -1,5 +1,4 @@
 #include "tree_sitter/parser.h"
-#include <ctype.h>
 #include <stdbool.h>
 
 // Must match the order of externals in grammar.js
@@ -20,12 +19,18 @@ void tree_sitter_sas_external_scanner_deserialize(void *payload, const char *buf
   (void)payload; (void)buffer; (void)length;
 }
 
+// ASCII-only helpers — no <ctype.h> dependency (avoids towlower/towupper in WASM).
+static int32_t to_lower(int32_t c) {
+  return (c >= 'A' && c <= 'Z') ? c + 32 : c;
+}
+
 static bool is_ident_char(int32_t c) {
-  return isalnum((unsigned char)c) || c == '_';
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+         (c >= '0' && c <= '9') || c == '_';
 }
 
 static bool advance_if(TSLexer *lexer, char expected) {
-  if (tolower((unsigned char)lexer->lookahead) == (unsigned char)expected) {
+  if (to_lower(lexer->lookahead) == (int32_t)expected) {
     lexer->advance(lexer, false);
     return true;
   }
@@ -64,7 +69,7 @@ bool tree_sitter_sas_external_scanner_scan(
   if (lexer->lookahead != '%') return false;
   lexer->advance(lexer, false);  // consume '%'
 
-  int32_t c = tolower((unsigned char)lexer->lookahead);
+  int32_t c = to_lower(lexer->lookahead);
 
   // Bare % — not followed by an identifier char, so it cannot be a keyword or
   // macro call trigger.  Exclude '*' to let the internal lexer produce the
@@ -88,7 +93,7 @@ bool tree_sitter_sas_external_scanner_scan(
   // ── %macro / %mend ────────────────────────────────────────────────────────
   if (c == 'm') {
     lexer->advance(lexer, false);  // consume 'm'
-    int32_t c2 = tolower((unsigned char)lexer->lookahead);
+    int32_t c2 = to_lower(lexer->lookahead);
 
     if (c2 == 'a' && valid_symbols[PCT_MACRO]) {
       lexer->advance(lexer, false);
