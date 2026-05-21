@@ -20,7 +20,6 @@ readme = "README.md"
 
 [project.urls]
 Homepage = "https://github.com/ix-infrastructure/tree-sitter-sas"
-Funding = ""
 
 [project.optional-dependencies]
 core = ["tree-sitter~=0.24"]
