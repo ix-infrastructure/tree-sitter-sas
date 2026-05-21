@@ -3,6 +3,8 @@
 A [tree-sitter](https://github.com/tree-sitter/tree-sitter) grammar for the [SAS programming language](https://www.sas.com/).
 
 [![npm](https://img.shields.io/npm/v/tree-sitter-sas)](https://www.npmjs.com/package/tree-sitter-sas)
+[![crates.io](https://img.shields.io/crates/v/tree-sitter-sas)](https://crates.io/crates/tree-sitter-sas)
+[![PyPI](https://img.shields.io/pypi/v/tree-sitter-sas)](https://pypi.org/project/tree-sitter-sas/)
 [![CI](https://github.com/ix-infrastructure/tree-sitter-sas/actions/workflows/ci.yml/badge.svg)](https://github.com/ix-infrastructure/tree-sitter-sas/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -18,20 +20,20 @@ Prebuilt native binaries ship for `linux-x64`, `darwin-x64`, and `darwin-arm64` 
 
 ## Rust bindings
 
-> **Coming soon** — a crates.io release is planned. In the meantime, use the GitHub source directly:
->
-> ```toml
-> [dependencies]
-> tree-sitter-sas = { git = "https://github.com/ix-infrastructure/tree-sitter-sas" }
-> ```
+Available on crates.io as [`tree-sitter-sas`](https://crates.io/crates/tree-sitter-sas).
+
+```toml
+[dependencies]
+tree-sitter-sas = "0.3"
+```
 
 ## Python bindings
 
-> **Coming soon** — a PyPI release is planned. In the meantime, build from source:
->
-> ```bash
-> pip install git+https://github.com/ix-infrastructure/tree-sitter-sas
-> ```
+Available on PyPI as [`tree-sitter-sas`](https://pypi.org/project/tree-sitter-sas/).
+
+```bash
+pip install tree-sitter-sas
+```
 
 ## Go bindings
 
