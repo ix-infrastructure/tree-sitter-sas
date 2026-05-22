@@ -28,3 +28,18 @@
 ; LIBNAME → import (library path)
 (libname_statement
   (string_literal) @import.source) @import
+
+; DATA step SET inputs → import (dataset lineage)
+(data_step
+  (set_statement
+    (dataset_name) @import.source)) @import
+
+; DATA step MERGE inputs → import (dataset lineage)
+(data_step
+  (merge_statement
+    (dataset_name) @import.source)) @import
+
+; DATA step UPDATE inputs → import (dataset lineage)
+(data_step
+  (update_statement
+    (dataset_name) @import.source)) @import

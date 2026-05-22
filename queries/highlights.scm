@@ -13,6 +13,11 @@
 (proc_step_header) @keyword
 (run_statement) @keyword
 (run_or_quit_statement) @keyword
+
+(set_statement) @keyword
+(merge_statement) @keyword
+(update_statement) @keyword
+(output_statement) @keyword
 (macro_end) @keyword
 
 (libname_statement) @keyword

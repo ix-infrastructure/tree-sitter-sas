@@ -77,7 +77,7 @@ export default grammar({
 
     data_step: $ => seq(
       $.data_step_header,
-      repeat($._step_statement),
+      repeat($._data_body_statement),
       $.run_statement,
     ),
 
@@ -145,6 +145,72 @@ export default grammar({
     // and macro bodies (common after %if/%else blocks that span multiple lines).
     // prec(-1) makes it lose to macro_call_statement's optional ";" when ambiguous.
     null_statement: $ => prec(-1, ";"),
+
+    // ── DATA step body ─────────────────────────────────────────────────────
+
+    // Superset of _step_statement — adds DATA-only input/output statements.
+    // Listed before generic_statement so specific rules win on keyword match.
+    _data_body_statement: $ => choice(
+      $.set_statement,
+      $.merge_statement,
+      $.update_statement,
+      $.output_statement,
+      $.macro_definition,
+      $.macro_variable_assignment,
+      $.include_statement,
+      $.macro_call_statement,
+      $.line_comment,
+      $.null_statement,
+      $.generic_statement,
+    ),
+
+    // SET input1 input2 ... ;
+    set_statement: $ => seq(
+      kw("SET"),
+      repeat1($._data_source),
+      ";",
+    ),
+
+    // MERGE ds1 ds2 ... ;
+    merge_statement: $ => seq(
+      kw("MERGE"),
+      repeat1($._data_source),
+      ";",
+    ),
+
+    // UPDATE master_ds [transaction_ds] ;
+    update_statement: $ => seq(
+      kw("UPDATE"),
+      repeat1($._data_source),
+      ";",
+    ),
+
+    // OUTPUT [ds1 ds2 ...] ;  — zero args writes to default output dataset
+    output_statement: $ => seq(
+      kw("OUTPUT"),
+      repeat($._data_source),
+      ";",
+    ),
+
+    // Dataset reference with optional named options block.
+    // Using a named ds_options node (not hidden) so any string_literal or
+    // macro_variable_ref inside the options is contained within ds_options
+    // and does not pollute the parent set_statement / merge_statement level.
+    _data_source: $ => seq(
+      $.dataset_name,
+      optional($.ds_options),
+    ),
+
+    ds_options: $ => seq(
+      "(",
+      repeat(choice(
+        $.string_literal,
+        $.macro_variable_ref,
+        $._paren_group,
+        /[^();"'&%]+/,
+      )),
+      ")",
+    ),
 
     // ── Macro definition ──────────────────────────────────────────────────
 

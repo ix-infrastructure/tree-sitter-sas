@@ -36,11 +36,27 @@
           "named": true
         },
         {
+          "type": "merge_statement",
+          "named": true
+        },
+        {
           "type": "null_statement",
           "named": true
         },
         {
+          "type": "output_statement",
+          "named": true
+        },
+        {
           "type": "run_statement",
+          "named": true
+        },
+        {
+          "type": "set_statement",
+          "named": true
+        },
+        {
+          "type": "update_statement",
           "named": true
         }
       ]
@@ -75,6 +91,29 @@
         },
         {
           "type": "macro_variable_ref",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "ds_options",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "string_literal",
           "named": true
         }
       ]
@@ -454,6 +493,25 @@
     }
   },
   {
+    "type": "merge_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "dataset_name",
+          "named": true
+        },
+        {
+          "type": "ds_options",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "null_statement",
     "named": true,
     "fields": {}
@@ -472,6 +530,25 @@
         },
         {
           "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "output_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "dataset_name",
+          "named": true
+        },
+        {
+          "type": "ds_options",
           "named": true
         }
       ]
@@ -617,9 +694,47 @@
     "fields": {}
   },
   {
+    "type": "set_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "dataset_name",
+          "named": true
+        },
+        {
+          "type": "ds_options",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "string_literal",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "update_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "dataset_name",
+          "named": true
+        },
+        {
+          "type": "ds_options",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "%",
