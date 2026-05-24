@@ -19,6 +19,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "proc_sql_step"
+        },
+        {
+          "type": "SYMBOL",
           "name": "proc_step"
         },
         {
@@ -284,6 +288,315 @@
           }
         ]
       }
+    },
+    "proc_sql_step": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "proc_sql_header"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_proc_sql_statement"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "run_or_quit_statement"
+        }
+      ]
+    },
+    "proc_sql_header": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[pP][rR][oO][cC]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[sS][qQ][lL]"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_option_token"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "_proc_sql_statement": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "sql_create_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sql_select_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sql_insert_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_assignment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "include_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "line_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "null_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "generic_statement"
+        }
+      ]
+    },
+    "sql_create_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[cC][rR][eE][aA][tT][eE]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[tT][aA][bB][lL][eE]"
+        },
+        {
+          "type": "FIELD",
+          "name": "output",
+          "content": {
+            "type": "SYMBOL",
+            "name": "dataset_name"
+          }
+        },
+        {
+          "type": "PATTERN",
+          "value": "[aA][sS]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sql_select_statement"
+        }
+      ]
+    },
+    "sql_select_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[sS][eE][lL][eE][cC][tT]"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_sql_stmt_tok"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[fF][rR][oO][mM]"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "table_reference"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_sql_after_from_tok"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "_sql_after_from_tok": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "sql_join_clause"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_sql_stmt_tok"
+        }
+      ]
+    },
+    "sql_join_clause": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[jJ][oO][iI][nN]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "table_reference"
+        }
+      ]
+    },
+    "table_reference": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "dataset_name"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[aA][sS]"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "sql_insert_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[iI][nN][sS][eE][rR][tT]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[iI][nN][tT][oO]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "dataset_name"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "sql_select_statement"
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_sql_stmt_tok"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": ";"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_sql_stmt_tok": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "string_literal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_paren_group"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_bare_pct"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[0-9]+(\\.[0-9]*)?([eE][+-]?[0-9]+)?"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\.[0-9]+([eE][+-]?[0-9]+)?"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^A-Za-z_0-9;()\\s\"'&%.]+"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\."
+        }
+      ]
     },
     "proc_step": {
       "type": "SEQ",
@@ -770,6 +1083,10 @@
         {
           "type": "SYMBOL",
           "name": "data_step"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "proc_sql_step"
         },
         {
           "type": "SYMBOL",

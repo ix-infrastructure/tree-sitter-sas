@@ -23,3 +23,9 @@
 (libname_statement) @keyword
 (include_statement) @keyword
 (options_statement) @keyword
+
+(proc_sql_header) @keyword
+(sql_create_statement) @keyword
+(sql_select_statement) @keyword
+(sql_insert_statement) @keyword
+(sql_join_clause) @keyword

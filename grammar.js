@@ -47,6 +47,7 @@ export default grammar({
 
     _top_level: $ => choice(
       $.data_step,
+      $.proc_sql_step,
       $.proc_step,
       $.macro_definition,
       $.macro_variable_assignment,
@@ -109,6 +110,111 @@ export default grammar({
       choice($.identifier, $.macro_variable_ref),
       repeat($.macro_variable_ref),
     )),
+
+    // ── PROC SQL step ─────────────────────────────────────────────────────
+
+    proc_sql_step: $ => seq(
+      $.proc_sql_header,
+      repeat($._proc_sql_statement),
+      $.run_or_quit_statement,
+    ),
+
+    proc_sql_header: $ => seq(
+      kw("PROC"),
+      kw("SQL"),
+      repeat($._option_token),
+      ";",
+    ),
+
+    _proc_sql_statement: $ => choice(
+      $.sql_create_statement,
+      $.sql_select_statement,
+      $.sql_insert_statement,
+      $.macro_definition,
+      $.macro_variable_assignment,
+      $.include_statement,
+      $.macro_call_statement,
+      $.line_comment,
+      $.null_statement,
+      $.generic_statement,
+    ),
+
+    // CREATE TABLE output AS SELECT ... ;
+    sql_create_statement: $ => seq(
+      kw("CREATE"),
+      kw("TABLE"),
+      field("output", $.dataset_name),
+      kw("AS"),
+      $.sql_select_statement,
+    ),
+
+    // SELECT ... [FROM table ...] ;
+    // Column list before FROM is kept flat (_sql_stmt_tok).
+    // FROM is optional to support `select 1;` and similar FROM-less selects.
+    // After the first table_reference, _sql_after_from_tok interleaves sql_join_clause
+    // nodes with flat tokens. This keeps kw("JOIN") valid throughout the after-FROM
+    // region, so keyword extraction correctly recognises JOIN even when preceded by
+    // qualifier words (LEFT/RIGHT/INNER/FULL/CROSS) that land in _sql_stmt_tok.
+    sql_select_statement: $ => seq(
+      kw("SELECT"),
+      repeat($._sql_stmt_tok),
+      optional(seq(
+        kw("FROM"),
+        $.table_reference,
+        repeat($._sql_after_from_tok),
+      )),
+      ";",
+    ),
+
+    // After FROM table: either a JOIN clause or any other SQL token (ON condition,
+    // WHERE, GROUP BY, HAVING, ORDER BY, etc. — all kept flat).
+    _sql_after_from_tok: $ => choice(
+      $.sql_join_clause,
+      $._sql_stmt_tok,
+    ),
+
+    // JOIN table_reference — join type qualifiers (LEFT/RIGHT/INNER/FULL/CROSS/OUTER)
+    // appear in the _sql_stmt_tok stream just before JOIN and are absorbed there.
+    // kw("JOIN") is the anchor that starts this rule; keyword extraction promotes it
+    // over $.identifier whenever sql_join_clause is a valid alternative in the context.
+    sql_join_clause: $ => seq(
+      kw("JOIN"),
+      $.table_reference,
+    ),
+
+    // dataset_name with optional AS alias
+    table_reference: $ => seq(
+      $.dataset_name,
+      optional(seq(kw("AS"), $.identifier)),
+    ),
+
+    // INSERT INTO table [SELECT ... | VALUES ...] ;
+    sql_insert_statement: $ => seq(
+      kw("INSERT"),
+      kw("INTO"),
+      $.dataset_name,
+      choice(
+        $.sql_select_statement,
+        seq(repeat($._sql_stmt_tok), ";"),
+      ),
+    ),
+
+    // SQL token: anything that is not a statement terminator.
+    // Stops on ";" only — keywords like FROM/JOIN are handled via tree-sitter
+    // keyword extraction (they win over identifier when they are valid tokens
+    // at the current parser state).
+    _sql_stmt_tok: $ => choice(
+      $.identifier,
+      $.string_literal,
+      $.macro_variable_ref,
+      $.macro_call,
+      $._paren_group,
+      $._bare_pct,
+      /[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?/,
+      /\.[0-9]+([eE][+-]?[0-9]+)?/,
+      /[^A-Za-z_0-9;()\s"'&%.]+/,
+      /\./,
+    ),
 
     // ── PROC step ─────────────────────────────────────────────────────────
 
@@ -248,6 +354,7 @@ export default grammar({
 
     _macro_body_item: $ => choice(
       $.data_step,
+      $.proc_sql_step,
       $.proc_step,
       $.macro_definition,
       $.macro_variable_assignment,
