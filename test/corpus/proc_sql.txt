@@ -1,0 +1,320 @@
+==================
+Simple PROC SQL empty body
+==================
+
+proc sql;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (run_or_quit_statement)))
+
+==================
+PROC SQL with options
+==================
+
+proc sql noprint;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (run_or_quit_statement)))
+
+==================
+SELECT without FROM
+==================
+
+proc sql;
+  select 1;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_select_statement)
+    (run_or_quit_statement)))
+
+==================
+SELECT with FROM
+==================
+
+proc sql;
+  select id from lib.source;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_select_statement
+      (identifier)
+      (table_reference
+        (dataset_name
+          (identifier)
+          (identifier))))
+    (run_or_quit_statement)))
+
+==================
+SELECT with JOIN
+==================
+
+proc sql;
+  select a.id
+  from lib.source_a as a
+  join lib.source_b as b on a.id = b.id;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_select_statement
+      (identifier)
+      (identifier)
+      (table_reference
+        (dataset_name
+          (identifier)
+          (identifier))
+        (identifier))
+      (sql_join_clause
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier))
+          (identifier)))
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (run_or_quit_statement)))
+
+==================
+SELECT with LEFT JOIN
+==================
+
+proc sql;
+  select a.id
+  from lib.source_a as a
+  left join lib.source_b as b on a.id = b.id;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_select_statement
+      (identifier)
+      (identifier)
+      (table_reference
+        (dataset_name
+          (identifier)
+          (identifier))
+        (identifier))
+      (identifier)
+      (sql_join_clause
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier))
+          (identifier)))
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (run_or_quit_statement)))
+
+==================
+SELECT with multiple JOINs
+==================
+
+proc sql;
+  select a.id
+  from lib.a as a
+  join lib.b as b on a.id = b.id
+  join lib.c as c on b.cid = c.id;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_select_statement
+      (identifier)
+      (identifier)
+      (table_reference
+        (dataset_name
+          (identifier)
+          (identifier))
+        (identifier))
+      (sql_join_clause
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier))
+          (identifier)))
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (sql_join_clause
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier))
+          (identifier)))
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    (run_or_quit_statement)))
+
+==================
+CREATE TABLE AS SELECT
+==================
+
+proc sql;
+  create table work.result as
+  select id from lib.source;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_create_statement
+      output: (dataset_name
+        (identifier)
+        (identifier))
+      (sql_select_statement
+        (identifier)
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier)))))
+    (run_or_quit_statement)))
+
+==================
+CREATE TABLE AS SELECT with JOIN
+==================
+
+proc sql;
+  create table work.result as
+  select a.id, b.val
+  from lib.source_a as a
+  left join lib.source_b as b on a.id = b.id;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_create_statement
+      output: (dataset_name
+        (identifier)
+        (identifier))
+      (sql_select_statement
+        (identifier)
+        (identifier)
+        (identifier)
+        (identifier)
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier))
+          (identifier))
+        (identifier)
+        (sql_join_clause
+          (table_reference
+            (dataset_name
+              (identifier)
+              (identifier))
+            (identifier)))
+        (identifier)
+        (identifier)
+        (identifier)
+        (identifier)
+        (identifier)))
+    (run_or_quit_statement)))
+
+==================
+INSERT INTO SELECT
+==================
+
+proc sql;
+  insert into work.log
+  select id, status
+  from lib.events;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_insert_statement
+      (dataset_name
+        (identifier)
+        (identifier))
+      (sql_select_statement
+        (identifier)
+        (identifier)
+        (table_reference
+          (dataset_name
+            (identifier)
+            (identifier)))))
+    (run_or_quit_statement)))
+
+==================
+SELECT with macro variable dataset names
+==================
+
+proc sql;
+  select *
+  from &libref..&dsname;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (sql_select_statement
+      (table_reference
+        (dataset_name
+          (macro_variable_ref)
+          (macro_variable_ref))))
+    (run_or_quit_statement)))
+
+==================
+Generic statement fallback in PROC SQL
+==================
+
+proc sql;
+  drop table work.tmp;
+quit;
+
+---
+
+(program
+  (proc_sql_step
+    (proc_sql_header)
+    (generic_statement)
+    (run_or_quit_statement)))

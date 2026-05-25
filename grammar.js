@@ -30,6 +30,11 @@ export default grammar({
     $._pct_mend,     // %mend
     $._pct_include,  // %include
     $._bare_pct,     // bare % not starting a macro call (e.g., width=20%)
+    $._pct_if,       // %if
+    $._pct_then,     // %then
+    $._pct_else,     // %else
+    $._pct_do,       // %do
+    $._pct_end,      // %end
   ],
 
   extras: $ => [
@@ -47,8 +52,11 @@ export default grammar({
 
     _top_level: $ => choice(
       $.data_step,
+      $.proc_sql_step,
       $.proc_step,
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.libname_statement,
@@ -77,7 +85,7 @@ export default grammar({
 
     data_step: $ => seq(
       $.data_step_header,
-      repeat($._step_statement),
+      repeat($._data_body_statement),
       $.run_statement,
     ),
 
@@ -110,6 +118,113 @@ export default grammar({
       repeat($.macro_variable_ref),
     )),
 
+    // ── PROC SQL step ─────────────────────────────────────────────────────
+
+    proc_sql_step: $ => seq(
+      $.proc_sql_header,
+      repeat($._proc_sql_statement),
+      $.run_or_quit_statement,
+    ),
+
+    proc_sql_header: $ => seq(
+      kw("PROC"),
+      kw("SQL"),
+      repeat($._option_token),
+      ";",
+    ),
+
+    _proc_sql_statement: $ => choice(
+      $.sql_create_statement,
+      $.sql_select_statement,
+      $.sql_insert_statement,
+      $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
+      $.macro_variable_assignment,
+      $.include_statement,
+      $.macro_call_statement,
+      $.line_comment,
+      $.null_statement,
+      $.generic_statement,
+    ),
+
+    // CREATE TABLE output AS SELECT ... ;
+    sql_create_statement: $ => seq(
+      kw("CREATE"),
+      kw("TABLE"),
+      field("output", $.dataset_name),
+      kw("AS"),
+      $.sql_select_statement,
+    ),
+
+    // SELECT ... [FROM table ...] ;
+    // Column list before FROM is kept flat (_sql_stmt_tok).
+    // FROM is optional to support `select 1;` and similar FROM-less selects.
+    // After the first table_reference, _sql_after_from_tok interleaves sql_join_clause
+    // nodes with flat tokens. This keeps kw("JOIN") valid throughout the after-FROM
+    // region, so keyword extraction correctly recognises JOIN even when preceded by
+    // qualifier words (LEFT/RIGHT/INNER/FULL/CROSS) that land in _sql_stmt_tok.
+    sql_select_statement: $ => seq(
+      kw("SELECT"),
+      repeat($._sql_stmt_tok),
+      optional(seq(
+        kw("FROM"),
+        $.table_reference,
+        repeat($._sql_after_from_tok),
+      )),
+      ";",
+    ),
+
+    // After FROM table: either a JOIN clause or any other SQL token (ON condition,
+    // WHERE, GROUP BY, HAVING, ORDER BY, etc. — all kept flat).
+    _sql_after_from_tok: $ => choice(
+      $.sql_join_clause,
+      $._sql_stmt_tok,
+    ),
+
+    // JOIN table_reference — join type qualifiers (LEFT/RIGHT/INNER/FULL/CROSS/OUTER)
+    // appear in the _sql_stmt_tok stream just before JOIN and are absorbed there.
+    // kw("JOIN") is the anchor that starts this rule; keyword extraction promotes it
+    // over $.identifier whenever sql_join_clause is a valid alternative in the context.
+    sql_join_clause: $ => seq(
+      kw("JOIN"),
+      $.table_reference,
+    ),
+
+    // dataset_name with optional AS alias
+    table_reference: $ => seq(
+      $.dataset_name,
+      optional(seq(kw("AS"), $.identifier)),
+    ),
+
+    // INSERT INTO table [SELECT ... | VALUES ...] ;
+    sql_insert_statement: $ => seq(
+      kw("INSERT"),
+      kw("INTO"),
+      $.dataset_name,
+      choice(
+        $.sql_select_statement,
+        seq(repeat($._sql_stmt_tok), ";"),
+      ),
+    ),
+
+    // SQL token: anything that is not a statement terminator.
+    // Stops on ";" only — keywords like FROM/JOIN are handled via tree-sitter
+    // keyword extraction (they win over identifier when they are valid tokens
+    // at the current parser state).
+    _sql_stmt_tok: $ => choice(
+      $.identifier,
+      $.string_literal,
+      $.macro_variable_ref,
+      $.macro_call,
+      $._paren_group,
+      $._bare_pct,
+      /[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?/,
+      /\.[0-9]+([eE][+-]?[0-9]+)?/,
+      /[^A-Za-z_0-9;()\s"'&%.]+/,
+      /\./,
+    ),
+
     // ── PROC step ─────────────────────────────────────────────────────────
 
     proc_step: $ => seq(
@@ -133,6 +248,8 @@ export default grammar({
 
     _step_statement: $ => choice(
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
@@ -145,6 +262,74 @@ export default grammar({
     // and macro bodies (common after %if/%else blocks that span multiple lines).
     // prec(-1) makes it lose to macro_call_statement's optional ";" when ambiguous.
     null_statement: $ => prec(-1, ";"),
+
+    // ── DATA step body ─────────────────────────────────────────────────────
+
+    // Superset of _step_statement — adds DATA-only input/output statements.
+    // Listed before generic_statement so specific rules win on keyword match.
+    _data_body_statement: $ => choice(
+      $.set_statement,
+      $.merge_statement,
+      $.update_statement,
+      $.output_statement,
+      $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
+      $.macro_variable_assignment,
+      $.include_statement,
+      $.macro_call_statement,
+      $.line_comment,
+      $.null_statement,
+      $.generic_statement,
+    ),
+
+    // SET input1 input2 ... ;
+    set_statement: $ => seq(
+      kw("SET"),
+      repeat1($._data_source),
+      ";",
+    ),
+
+    // MERGE ds1 ds2 ... ;
+    merge_statement: $ => seq(
+      kw("MERGE"),
+      repeat1($._data_source),
+      ";",
+    ),
+
+    // UPDATE master_ds [transaction_ds] ;
+    update_statement: $ => seq(
+      kw("UPDATE"),
+      repeat1($._data_source),
+      ";",
+    ),
+
+    // OUTPUT [ds1 ds2 ...] ;  — zero args writes to default output dataset
+    output_statement: $ => seq(
+      kw("OUTPUT"),
+      repeat($._data_source),
+      ";",
+    ),
+
+    // Dataset reference with optional named options block.
+    // Using a named ds_options node (not hidden) so any string_literal or
+    // macro_variable_ref inside the options is contained within ds_options
+    // and does not pollute the parent set_statement / merge_statement level.
+    _data_source: $ => seq(
+      $.dataset_name,
+      optional($.ds_options),
+    ),
+
+    ds_options: $ => seq(
+      "(",
+      repeat(choice(
+        $.string_literal,
+        $.macro_variable_ref,
+        $._paren_group,
+        /[^();"'&%]+/,
+      )),
+      ")",
+    ),
 
     // ── Macro definition ──────────────────────────────────────────────────
 
@@ -174,6 +359,7 @@ export default grammar({
 
     _macro_param_default: $ => repeat1(choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -182,8 +368,11 @@ export default grammar({
 
     _macro_body_item: $ => choice(
       $.data_step,
+      $.proc_sql_step,
       $.proc_step,
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
@@ -196,6 +385,31 @@ export default grammar({
     macro_end: $ => seq(
       $._pct_mend,
       optional($.macro_name),
+      ";",
+    ),
+
+    // %if condition %then body [%else body]
+    // prec.right resolves the dangling-else: inner %if claims the %else.
+    macro_if_statement: $ => prec.right(seq(
+      $._pct_if,
+      repeat($._mc_tok_inner),
+      $._pct_then,
+      $._macro_body_item,
+      optional(seq(
+        $._pct_else,
+        $._macro_body_item,
+      )),
+    )),
+
+    // %do [spec] ; body %end ;
+    // spec covers loop forms (%do i=1 %to &n) and condition forms (%do %while(...)).
+    // Kept flat via _mc_tok_inner — no structured parsing of loop parameters needed.
+    macro_do_statement: $ => seq(
+      $._pct_do,
+      repeat($._mc_tok_inner),
+      ";",
+      repeat($._macro_body_item),
+      $._pct_end,
       ";",
     ),
 
@@ -264,6 +478,7 @@ export default grammar({
 
     _macro_arg: $ => repeat1(choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -281,6 +496,7 @@ export default grammar({
 
     _paren_group_item: $ => choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -292,6 +508,7 @@ export default grammar({
     // unambiguous when "(" follows the macro name.
     _mc_tok: $ => choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       /&=[A-Za-z_][A-Za-z0-9_]*/,  // %put &=var shorthand
@@ -302,6 +519,7 @@ export default grammar({
     // parenthesized groups for bare SAS calls like n(&panelby) and opt=(...).
     _mc_tok_inner: $ => choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -328,6 +546,7 @@ export default grammar({
 
     _macro_value: $ => repeat1(choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       /[^;]+/,
@@ -382,12 +601,14 @@ export default grammar({
     generic_statement: $ => seq(
       choice(
         $.string_literal,
+        $.numeric_literal,
         $.macro_variable_ref,
         /[^;%\/\s"'&]+/,
         /\//,
       ),
       repeat(choice(
         $.string_literal,
+        $.numeric_literal,
         $.macro_variable_ref,
         $.macro_call,
         $._bare_pct,
@@ -436,11 +657,13 @@ export default grammar({
     // b=bit, d=date, dt=datetime, n=name-literal, t=time, x=hex-char
     _string_suffix: $ => token.immediate(/[BbDdNnTtXx][Tt]?/),
 
-    // Decimal, scientific, or SAS hex numeric
-    numeric_literal: $ => token(choice(
+    // Decimal, scientific, or SAS hex numeric.
+    // prec(1) ensures numeric_literal wins over equal-length catch-all regexes
+    // (e.g. /[^;%()\s"'&]+/) when both match the same text like "42" or "3.14".
+    numeric_literal: $ => token(prec(1, choice(
       /[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?/,
       /\.[0-9]+([eE][+-]?[0-9]+)?/,
       /[0-9A-Fa-f]+[Xx]/,
-    )),
+    ))),
   },
 });

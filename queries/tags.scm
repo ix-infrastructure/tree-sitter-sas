@@ -28,3 +28,33 @@
 ; LIBNAME → import (library path)
 (libname_statement
   (string_literal) @import.source) @import
+
+; PROC SQL output tables (CREATE TABLE AS)
+(sql_create_statement
+  output: (dataset_name) @name) @definition.module
+
+; PROC SQL input tables (FROM clause)
+(sql_select_statement
+  (table_reference
+    (dataset_name) @import.source)) @import
+
+; PROC SQL input tables (JOIN clause)
+(sql_select_statement
+  (sql_join_clause
+    (table_reference
+      (dataset_name) @import.source))) @import
+
+; DATA step SET inputs → import (dataset lineage)
+(data_step
+  (set_statement
+    (dataset_name) @import.source)) @import
+
+; DATA step MERGE inputs → import (dataset lineage)
+(data_step
+  (merge_statement
+    (dataset_name) @import.source)) @import
+
+; DATA step UPDATE inputs → import (dataset lineage)
+(data_step
+  (update_statement
+    (dataset_name) @import.source)) @import

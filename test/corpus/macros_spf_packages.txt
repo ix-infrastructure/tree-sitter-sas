@@ -71,7 +71,8 @@ SAS SPF Packages SQL PARMBUFF SECURE same line
       (identifier)
       (identifier))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))
@@ -101,7 +102,8 @@ secure minoperator
       (identifier)
       (identifier))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))
@@ -124,14 +126,16 @@ des='Macro to list SAS packages'
       (identifier))
     (macro_parameters
       (identifier)
-      (identifier))
+      (identifier)
+      (numeric_literal))
     (macro_options
       (identifier)
       (identifier)
       (identifier)
       (string_literal))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))
@@ -159,7 +163,8 @@ des='internal macro'
       (identifier)
       (string_literal))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))
@@ -191,7 +196,8 @@ des='verify'
       (identifier)
       (string_literal))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))
@@ -228,7 +234,8 @@ minoperator
       (string_literal)
       (identifier))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))
@@ -258,7 +265,8 @@ des='help'
       (identifier)
       (string_literal))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (macro_end
       (macro_name
         (identifier)))))

@@ -19,11 +19,23 @@
         },
         {
           "type": "SYMBOL",
+          "name": "proc_sql_step"
+        },
+        {
+          "type": "SYMBOL",
           "name": "proc_step"
         },
         {
           "type": "SYMBOL",
           "name": "macro_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_if_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_do_statement"
         },
         {
           "type": "SYMBOL",
@@ -126,7 +138,7 @@
           "type": "REPEAT",
           "content": {
             "type": "SYMBOL",
-            "name": "_step_statement"
+            "name": "_data_body_statement"
           }
         },
         {
@@ -285,6 +297,323 @@
         ]
       }
     },
+    "proc_sql_step": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "proc_sql_header"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_proc_sql_statement"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "run_or_quit_statement"
+        }
+      ]
+    },
+    "proc_sql_header": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[pP][rR][oO][cC]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[sS][qQ][lL]"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_option_token"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "_proc_sql_statement": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "sql_create_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sql_select_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sql_insert_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_if_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_do_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_assignment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "include_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "line_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "null_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "generic_statement"
+        }
+      ]
+    },
+    "sql_create_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[cC][rR][eE][aA][tT][eE]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[tT][aA][bB][lL][eE]"
+        },
+        {
+          "type": "FIELD",
+          "name": "output",
+          "content": {
+            "type": "SYMBOL",
+            "name": "dataset_name"
+          }
+        },
+        {
+          "type": "PATTERN",
+          "value": "[aA][sS]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sql_select_statement"
+        }
+      ]
+    },
+    "sql_select_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[sS][eE][lL][eE][cC][tT]"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_sql_stmt_tok"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[fF][rR][oO][mM]"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "table_reference"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_sql_after_from_tok"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "_sql_after_from_tok": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "sql_join_clause"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_sql_stmt_tok"
+        }
+      ]
+    },
+    "sql_join_clause": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[jJ][oO][iI][nN]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "table_reference"
+        }
+      ]
+    },
+    "table_reference": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "dataset_name"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[aA][sS]"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "sql_insert_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[iI][nN][sS][eE][rR][tT]"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[iI][nN][tT][oO]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "dataset_name"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "sql_select_statement"
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_sql_stmt_tok"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": ";"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_sql_stmt_tok": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "string_literal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_paren_group"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_bare_pct"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[0-9]+(\\.[0-9]*)?([eE][+-]?[0-9]+)?"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\.[0-9]+([eE][+-]?[0-9]+)?"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^A-Za-z_0-9;()\\s\"'&%.]+"
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\."
+        }
+      ]
+    },
     "proc_step": {
       "type": "SEQ",
       "members": [
@@ -377,6 +706,14 @@
         },
         {
           "type": "SYMBOL",
+          "name": "macro_if_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_do_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "macro_variable_assignment"
         },
         {
@@ -408,6 +745,201 @@
         "type": "STRING",
         "value": ";"
       }
+    },
+    "_data_body_statement": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "set_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "merge_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "update_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "output_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_if_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_do_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_variable_assignment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "include_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_call_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "line_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "null_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "generic_statement"
+        }
+      ]
+    },
+    "set_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[sS][eE][tT]"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_data_source"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "merge_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[mM][eE][rR][gG][eE]"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_data_source"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "update_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[uU][pP][dD][aA][tT][eE]"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_data_source"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "output_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[oO][uU][tT][pP][uU][tT]"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_data_source"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "_data_source": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "dataset_name"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "ds_options"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "ds_options": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "string_literal"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "macro_variable_ref"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_paren_group"
+              },
+              {
+                "type": "PATTERN",
+                "value": "[^();\"'&%]+"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
     },
     "macro_definition": {
       "type": "SEQ",
@@ -560,6 +1092,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "numeric_literal"
+          },
+          {
+            "type": "SYMBOL",
             "name": "macro_variable_ref"
           },
           {
@@ -586,11 +1122,23 @@
         },
         {
           "type": "SYMBOL",
+          "name": "proc_sql_step"
+        },
+        {
+          "type": "SYMBOL",
           "name": "proc_step"
         },
         {
           "type": "SYMBOL",
           "name": "macro_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_if_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro_do_statement"
         },
         {
           "type": "SYMBOL",
@@ -640,6 +1188,90 @@
               "type": "BLANK"
             }
           ]
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
+    "macro_if_statement": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_pct_if"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_mc_tok_inner"
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_pct_then"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_macro_body_item"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_pct_else"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_macro_body_item"
+                  }
+                ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "macro_do_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_pct_do"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_mc_tok_inner"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_macro_body_item"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_pct_end"
         },
         {
           "type": "STRING",
@@ -899,6 +1531,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "numeric_literal"
+          },
+          {
+            "type": "SYMBOL",
             "name": "macro_variable_ref"
           },
           {
@@ -945,6 +1581,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "numeric_literal"
+        },
+        {
+          "type": "SYMBOL",
           "name": "macro_variable_ref"
         },
         {
@@ -970,6 +1610,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "numeric_literal"
+        },
+        {
+          "type": "SYMBOL",
           "name": "macro_variable_ref"
         },
         {
@@ -992,6 +1636,10 @@
         {
           "type": "SYMBOL",
           "name": "string_literal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "numeric_literal"
         },
         {
           "type": "SYMBOL",
@@ -1093,6 +1741,10 @@
           {
             "type": "SYMBOL",
             "name": "string_literal"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "numeric_literal"
           },
           {
             "type": "SYMBOL",
@@ -1235,6 +1887,10 @@
             },
             {
               "type": "SYMBOL",
+              "name": "numeric_literal"
+            },
+            {
+              "type": "SYMBOL",
               "name": "macro_variable_ref"
             },
             {
@@ -1255,6 +1911,10 @@
               {
                 "type": "SYMBOL",
                 "name": "string_literal"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "numeric_literal"
               },
               {
                 "type": "SYMBOL",
@@ -1438,21 +2098,25 @@
     "numeric_literal": {
       "type": "TOKEN",
       "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "[0-9]+(\\.[0-9]*)?([eE][+-]?[0-9]+)?"
-          },
-          {
-            "type": "PATTERN",
-            "value": "\\.[0-9]+([eE][+-]?[0-9]+)?"
-          },
-          {
-            "type": "PATTERN",
-            "value": "[0-9A-Fa-f]+[Xx]"
-          }
-        ]
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "[0-9]+(\\.[0-9]*)?([eE][+-]?[0-9]+)?"
+            },
+            {
+              "type": "PATTERN",
+              "value": "\\.[0-9]+([eE][+-]?[0-9]+)?"
+            },
+            {
+              "type": "PATTERN",
+              "value": "[0-9A-Fa-f]+[Xx]"
+            }
+          ]
+        }
       }
     }
   },
@@ -1492,6 +2156,26 @@
     {
       "type": "SYMBOL",
       "name": "_bare_pct"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_pct_if"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_pct_then"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_pct_else"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_pct_do"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_pct_end"
     }
   ],
   "inline": [],
