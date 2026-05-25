@@ -168,7 +168,8 @@ des = 'Macro to list SAS packages.'
       (identifier))
     (macro_parameters
       (identifier)
-      (identifier))
+      (identifier)
+      (numeric_literal))
     (macro_options
       (identifier)
       (identifier)
@@ -354,13 +355,11 @@ Macro do loop header
 ---
 
 (program
-  (macro_call_statement
-    name: (macro_name)
+  (macro_do_statement
+    (numeric_literal)
     (macro_call
       name: (macro_name))
-    (macro_variable_ref))
-  (macro_call_statement
-    name: (macro_name)))
+    (macro_variable_ref)))
 
 ==================
 Macro if then do
@@ -372,15 +371,10 @@ Macro if then do
 ---
 
 (program
-  (macro_call_statement
-    name: (macro_name)
+  (macro_if_statement
     (macro_variable_ref)
-    (macro_call
-      name: (macro_name))
-    (macro_call
-      name: (macro_name)))
-  (macro_call_statement
-    name: (macro_name)))
+    (numeric_literal)
+    (macro_do_statement)))
 
 ==================
 Macro global statement
@@ -405,3 +399,154 @@ Macro global multiple variables
 (program
   (macro_call_statement
     name: (macro_name)))
+
+==================
+Numeric literal integer
+==================
+
+%let n = 42;
+
+---
+
+(program
+  (macro_variable_assignment
+    name: (identifier)
+    value: (numeric_literal)))
+
+==================
+Numeric literal float
+==================
+
+%let x = 3.14;
+
+---
+
+(program
+  (macro_variable_assignment
+    name: (identifier)
+    value: (numeric_literal)))
+
+==================
+Numeric literal hex
+==================
+
+%let h = 1A2Bx;
+
+---
+
+(program
+  (macro_variable_assignment
+    name: (identifier)
+    value: (numeric_literal)))
+
+==================
+Macro if then statement
+==================
+
+%if &debug = 1 %then %put debug mode;
+
+---
+
+(program
+  (macro_if_statement
+    (macro_variable_ref)
+    (numeric_literal)
+    (macro_call_statement
+      name: (macro_name))))
+
+==================
+Macro if then else
+==================
+
+%if &x > 0 %then %let result = pos;
+%else %let result = neg;
+
+---
+
+(program
+  (macro_if_statement
+    (macro_variable_ref)
+    (numeric_literal)
+    (macro_variable_assignment
+      name: (identifier))
+    (macro_variable_assignment
+      name: (identifier))))
+
+==================
+Macro if then do block
+==================
+
+%if &cond = 1 %then %do;
+  %let msg = yes;
+%end;
+
+---
+
+(program
+  (macro_if_statement
+    (macro_variable_ref)
+    (numeric_literal)
+    (macro_do_statement
+      (macro_variable_assignment
+        name: (identifier)))))
+
+==================
+Macro do loop
+==================
+
+%do i = 1 %to 10;
+  %put &i.;
+%end;
+
+---
+
+(program
+  (macro_do_statement
+    (numeric_literal)
+    (macro_call
+      name: (macro_name))
+    (numeric_literal)
+    (macro_call_statement
+      name: (macro_name)
+      (macro_variable_ref))))
+
+==================
+Macro do while loop
+==================
+
+%do %while(&i < 10);
+  %let i = %eval(&i + 1);
+%end;
+
+---
+
+(program
+  (macro_do_statement
+    (macro_call
+      name: (macro_name)
+      (macro_arguments
+        (macro_variable_ref)
+        (numeric_literal)))
+    (macro_variable_assignment
+      name: (identifier))))
+
+==================
+Nested macro if
+==================
+
+%if &a = 1 %then %do;
+  %if &b = 2 %then %put nested;
+%end;
+
+---
+
+(program
+  (macro_if_statement
+    (macro_variable_ref)
+    (numeric_literal)
+    (macro_do_statement
+      (macro_if_statement
+        (macro_variable_ref)
+        (numeric_literal)
+        (macro_call_statement
+          name: (macro_name))))))

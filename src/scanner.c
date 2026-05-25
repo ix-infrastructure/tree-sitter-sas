@@ -8,6 +8,11 @@ enum TokenType {
   PCT_MEND,
   PCT_INCLUDE,
   BARE_PCT,
+  PCT_IF,
+  PCT_THEN,
+  PCT_ELSE,
+  PCT_DO,
+  PCT_END,
 };
 
 void *tree_sitter_sas_external_scanner_create(void) { return NULL; }
@@ -118,14 +123,77 @@ bool tree_sitter_sas_external_scanner_scan(
     return false;
   }
 
-  // ── %include ──────────────────────────────────────────────────────────────
-  if (c == 'i' && valid_symbols[PCT_INCLUDE]) {
+  // ── %if / %include ────────────────────────────────────────────────────────
+  if (c == 'i' && (valid_symbols[PCT_IF] || valid_symbols[PCT_INCLUDE])) {
+    lexer->advance(lexer, false);  // consume 'i'
+    int32_t c2 = to_lower(lexer->lookahead);
+
+    if (c2 == 'f' && valid_symbols[PCT_IF]) {
+      lexer->advance(lexer, false);
+      if (!is_ident_char(lexer->lookahead)) {
+        lexer->result_symbol = PCT_IF;
+        return true;
+      }
+      return false;
+    }
+
+    if (c2 == 'n' && valid_symbols[PCT_INCLUDE]) {
+      lexer->advance(lexer, false);
+      if (advance_if(lexer, 'c') && advance_if(lexer, 'l') &&
+          advance_if(lexer, 'u') && advance_if(lexer, 'd') &&
+          advance_if(lexer, 'e') && !is_ident_char(lexer->lookahead)) {
+        lexer->result_symbol = PCT_INCLUDE;
+        return true;
+      }
+      return false;
+    }
+
+    return false;
+  }
+
+  // ── %then ─────────────────────────────────────────────────────────────────
+  if (c == 't' && valid_symbols[PCT_THEN]) {
     lexer->advance(lexer, false);
-    if (advance_if(lexer, 'n') && advance_if(lexer, 'c') &&
-        advance_if(lexer, 'l') && advance_if(lexer, 'u') &&
-        advance_if(lexer, 'd') && advance_if(lexer, 'e') &&
-        !is_ident_char(lexer->lookahead)) {
-      lexer->result_symbol = PCT_INCLUDE;
+    if (advance_if(lexer, 'h') && advance_if(lexer, 'e') &&
+        advance_if(lexer, 'n') && !is_ident_char(lexer->lookahead)) {
+      lexer->result_symbol = PCT_THEN;
+      return true;
+    }
+    return false;
+  }
+
+  // ── %else / %end ──────────────────────────────────────────────────────────
+  if (c == 'e' && (valid_symbols[PCT_ELSE] || valid_symbols[PCT_END])) {
+    lexer->advance(lexer, false);  // consume 'e'
+    int32_t c2 = to_lower(lexer->lookahead);
+
+    if (c2 == 'l' && valid_symbols[PCT_ELSE]) {
+      lexer->advance(lexer, false);
+      if (advance_if(lexer, 's') && advance_if(lexer, 'e') &&
+          !is_ident_char(lexer->lookahead)) {
+        lexer->result_symbol = PCT_ELSE;
+        return true;
+      }
+      return false;
+    }
+
+    if (c2 == 'n' && valid_symbols[PCT_END]) {
+      lexer->advance(lexer, false);
+      if (advance_if(lexer, 'd') && !is_ident_char(lexer->lookahead)) {
+        lexer->result_symbol = PCT_END;
+        return true;
+      }
+      return false;
+    }
+
+    return false;
+  }
+
+  // ── %do ───────────────────────────────────────────────────────────────────
+  if (c == 'd' && valid_symbols[PCT_DO]) {
+    lexer->advance(lexer, false);
+    if (advance_if(lexer, 'o') && !is_ident_char(lexer->lookahead)) {
+      lexer->result_symbol = PCT_DO;
       return true;
     }
     return false;

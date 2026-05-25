@@ -86,7 +86,8 @@ run;
       (dataset_name
         (identifier)))
     (macro_variable_assignment
-      name: (identifier))
+      name: (identifier)
+      value: (numeric_literal))
     (run_statement)))
 
 ==================

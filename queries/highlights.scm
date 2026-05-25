@@ -4,9 +4,13 @@
 (macro_definition) @function
 (macro_name) @function.method
 
+(macro_if_statement) @keyword.control
+(macro_do_statement) @keyword.control
+
 (macro_variable_assignment) @keyword
 (macro_variable_ref) @variable
 
+(numeric_literal) @constant.numeric
 (string_literal) @string
 
 (data_step_header) @keyword

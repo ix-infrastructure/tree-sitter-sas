@@ -32,6 +32,14 @@
           "named": true
         },
         {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
+          "named": true
+        },
+        {
           "type": "macro_variable_assignment",
           "named": true
         },
@@ -113,6 +121,10 @@
           "named": true
         },
         {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
           "type": "string_literal",
           "named": true
         }
@@ -133,6 +145,10 @@
         },
         {
           "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "numeric_literal",
           "named": true
         },
         {
@@ -219,6 +235,10 @@
           "named": true
         },
         {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
           "type": "string_literal",
           "named": true
         }
@@ -283,6 +303,10 @@
           "named": true
         },
         {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
           "type": "string_literal",
           "named": true
         }
@@ -333,7 +357,15 @@
           "named": true
         },
         {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
           "type": "macro_end",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
           "named": true
         },
         {
@@ -368,6 +400,85 @@
     }
   },
   {
+    "type": "macro_do_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "data_step",
+          "named": true
+        },
+        {
+          "type": "generic_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_call_statement",
+          "named": true
+        },
+        {
+          "type": "macro_definition",
+          "named": true
+        },
+        {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
+          "named": true
+        },
+        {
+          "type": "macro_label",
+          "named": true
+        },
+        {
+          "type": "macro_variable_assignment",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "null_statement",
+          "named": true
+        },
+        {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
+          "type": "proc_sql_step",
+          "named": true
+        },
+        {
+          "type": "proc_step",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "macro_end",
     "named": true,
     "fields": {},
@@ -377,6 +488,85 @@
       "types": [
         {
           "type": "macro_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "macro_if_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "data_step",
+          "named": true
+        },
+        {
+          "type": "generic_statement",
+          "named": true
+        },
+        {
+          "type": "include_statement",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "macro_call",
+          "named": true
+        },
+        {
+          "type": "macro_call_statement",
+          "named": true
+        },
+        {
+          "type": "macro_definition",
+          "named": true
+        },
+        {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
+          "named": true
+        },
+        {
+          "type": "macro_label",
+          "named": true
+        },
+        {
+          "type": "macro_variable_assignment",
+          "named": true
+        },
+        {
+          "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "null_statement",
+          "named": true
+        },
+        {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
+          "type": "proc_sql_step",
+          "named": true
+        },
+        {
+          "type": "proc_step",
+          "named": true
+        },
+        {
+          "type": "string_literal",
           "named": true
         }
       ]
@@ -452,6 +642,10 @@
           "named": true
         },
         {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
           "type": "string_literal",
           "named": true
         }
@@ -486,6 +680,10 @@
           },
           {
             "type": "macro_variable_ref",
+            "named": true
+          },
+          {
+            "type": "numeric_literal",
             "named": true
           },
           {
@@ -606,6 +804,14 @@
           "named": true
         },
         {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
+          "named": true
+        },
+        {
           "type": "macro_variable_assignment",
           "named": true
         },
@@ -662,6 +868,14 @@
         },
         {
           "type": "macro_definition",
+          "named": true
+        },
+        {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
           "named": true
         },
         {
@@ -748,6 +962,14 @@
         },
         {
           "type": "macro_definition",
+          "named": true
+        },
+        {
+          "type": "macro_do_statement",
+          "named": true
+        },
+        {
+          "type": "macro_if_statement",
           "named": true
         },
         {
@@ -849,6 +1071,10 @@
           "named": true
         },
         {
+          "type": "numeric_literal",
+          "named": true
+        },
+        {
           "type": "sql_select_statement",
           "named": true
         },
@@ -892,6 +1118,10 @@
         },
         {
           "type": "macro_variable_ref",
+          "named": true
+        },
+        {
+          "type": "numeric_literal",
           "named": true
         },
         {
@@ -1002,6 +1232,10 @@
   },
   {
     "type": "macro_variable_ref",
+    "named": true
+  },
+  {
+    "type": "numeric_literal",
     "named": true
   },
   {

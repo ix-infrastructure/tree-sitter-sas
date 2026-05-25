@@ -30,6 +30,11 @@ export default grammar({
     $._pct_mend,     // %mend
     $._pct_include,  // %include
     $._bare_pct,     // bare % not starting a macro call (e.g., width=20%)
+    $._pct_if,       // %if
+    $._pct_then,     // %then
+    $._pct_else,     // %else
+    $._pct_do,       // %do
+    $._pct_end,      // %end
   ],
 
   extras: $ => [
@@ -50,6 +55,8 @@ export default grammar({
       $.proc_sql_step,
       $.proc_step,
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.libname_statement,
@@ -131,6 +138,8 @@ export default grammar({
       $.sql_select_statement,
       $.sql_insert_statement,
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
@@ -239,6 +248,8 @@ export default grammar({
 
     _step_statement: $ => choice(
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
@@ -262,6 +273,8 @@ export default grammar({
       $.update_statement,
       $.output_statement,
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
@@ -346,6 +359,7 @@ export default grammar({
 
     _macro_param_default: $ => repeat1(choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -357,6 +371,8 @@ export default grammar({
       $.proc_sql_step,
       $.proc_step,
       $.macro_definition,
+      $.macro_if_statement,
+      $.macro_do_statement,
       $.macro_variable_assignment,
       $.include_statement,
       $.macro_call_statement,
@@ -369,6 +385,31 @@ export default grammar({
     macro_end: $ => seq(
       $._pct_mend,
       optional($.macro_name),
+      ";",
+    ),
+
+    // %if condition %then body [%else body]
+    // prec.right resolves the dangling-else: inner %if claims the %else.
+    macro_if_statement: $ => prec.right(seq(
+      $._pct_if,
+      repeat($._mc_tok_inner),
+      $._pct_then,
+      $._macro_body_item,
+      optional(seq(
+        $._pct_else,
+        $._macro_body_item,
+      )),
+    )),
+
+    // %do [spec] ; body %end ;
+    // spec covers loop forms (%do i=1 %to &n) and condition forms (%do %while(...)).
+    // Kept flat via _mc_tok_inner — no structured parsing of loop parameters needed.
+    macro_do_statement: $ => seq(
+      $._pct_do,
+      repeat($._mc_tok_inner),
+      ";",
+      repeat($._macro_body_item),
+      $._pct_end,
       ";",
     ),
 
@@ -437,6 +478,7 @@ export default grammar({
 
     _macro_arg: $ => repeat1(choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -454,6 +496,7 @@ export default grammar({
 
     _paren_group_item: $ => choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -465,6 +508,7 @@ export default grammar({
     // unambiguous when "(" follows the macro name.
     _mc_tok: $ => choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       /&=[A-Za-z_][A-Za-z0-9_]*/,  // %put &=var shorthand
@@ -475,6 +519,7 @@ export default grammar({
     // parenthesized groups for bare SAS calls like n(&panelby) and opt=(...).
     _mc_tok_inner: $ => choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       $._paren_group,
@@ -501,6 +546,7 @@ export default grammar({
 
     _macro_value: $ => repeat1(choice(
       $.string_literal,
+      $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
       /[^;]+/,
@@ -555,12 +601,14 @@ export default grammar({
     generic_statement: $ => seq(
       choice(
         $.string_literal,
+        $.numeric_literal,
         $.macro_variable_ref,
         /[^;%\/\s"'&]+/,
         /\//,
       ),
       repeat(choice(
         $.string_literal,
+        $.numeric_literal,
         $.macro_variable_ref,
         $.macro_call,
         $._bare_pct,
@@ -609,11 +657,13 @@ export default grammar({
     // b=bit, d=date, dt=datetime, n=name-literal, t=time, x=hex-char
     _string_suffix: $ => token.immediate(/[BbDdNnTtXx][Tt]?/),
 
-    // Decimal, scientific, or SAS hex numeric
-    numeric_literal: $ => token(choice(
+    // Decimal, scientific, or SAS hex numeric.
+    // prec(1) ensures numeric_literal wins over equal-length catch-all regexes
+    // (e.g. /[^;%()\s"'&]+/) when both match the same text like "42" or "3.14".
+    numeric_literal: $ => token(prec(1, choice(
       /[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?/,
       /\.[0-9]+([eE][+-]?[0-9]+)?/,
       /[0-9A-Fa-f]+[Xx]/,
-    )),
+    ))),
   },
 });
