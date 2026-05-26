@@ -1772,8 +1772,17 @@
           "type": "FIELD",
           "name": "source",
           "content": {
-            "type": "SYMBOL",
-            "name": "string_literal"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "string_literal"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "fileref_source"
+              }
+            ]
           }
         },
         {
@@ -1788,6 +1797,10 @@
           "value": ";"
         }
       ]
+    },
+    "fileref_source": {
+      "type": "PATTERN",
+      "value": "[A-Za-z_][A-Za-z0-9_]*(\\([A-Za-z_][A-Za-z0-9_.]+\\))?"
     },
     "libname_statement": {
       "type": "SEQ",

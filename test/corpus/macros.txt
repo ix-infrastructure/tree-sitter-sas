@@ -291,6 +291,30 @@ Include statement
     source: (string_literal)))
 
 ==================
+Include statement fileref with member
+==================
+
+%include PROGRMS(IQI_HOSP_FORMATS.SAS);
+
+---
+
+(program
+  (include_statement
+    source: (fileref_source)))
+
+==================
+Include statement fileref without member
+==================
+
+%include MacLib;
+
+---
+
+(program
+  (include_statement
+    source: (fileref_source)))
+
+==================
 Macro variable reference
 ==================
 

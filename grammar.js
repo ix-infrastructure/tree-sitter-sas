@@ -556,10 +556,20 @@ export default grammar({
 
     include_statement: $ => seq(
       $._pct_include,
-      field("source", $.string_literal),
+      field("source", choice(
+        $.string_literal,
+        $.fileref_source,
+      )),
       repeat($._option_token),
       ";",
     ),
+
+    // Fileref syntax: %include FILEREF; or %include FILEREF(member.sas);
+    // Defined as a single lexed terminal so the lexer matches FILEREF(member)
+    // atomically — longer match beats the plain identifier, preventing
+    // _option_token's catch-all regex from swallowing the parens first.
+    // Captured as @import.source in queries; member name is inside the parens.
+    fileref_source: $ => /[A-Za-z_][A-Za-z0-9_]*(\([A-Za-z_][A-Za-z0-9_.]+\))?/,
 
     // ── LIBNAME ───────────────────────────────────────────────────────────
 

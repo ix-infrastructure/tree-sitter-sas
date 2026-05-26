@@ -167,6 +167,10 @@
         "required": true,
         "types": [
           {
+            "type": "fileref_source",
+            "named": true
+          },
+          {
             "type": "string_literal",
             "named": true
           }
@@ -1220,6 +1224,10 @@
   },
   {
     "type": "block_comment",
+    "named": true
+  },
+  {
+    "type": "fileref_source",
     "named": true
   },
   {

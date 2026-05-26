@@ -21,9 +21,13 @@
   (proc_step_header
     name: (identifier) @name)) @definition.module
 
-; %INCLUDE → import
+; %INCLUDE → import (string literal form)
 (include_statement
   source: (string_literal) @import.source) @import
+
+; %INCLUDE → import (fileref form: FILEREF or FILEREF(member.sas))
+(include_statement
+  source: (fileref_source) @import.source) @import
 
 ; LIBNAME → import (library path)
 (libname_statement
