@@ -45,6 +45,11 @@ export default grammar({
 
   word: $ => $.identifier,
 
+  conflicts: $ => [
+    [$.generic_statement, $._mc_tok_inner],
+    [$.macro_call_statement, $.macro_call],
+  ],
+
   rules: {
     // ── Top level ──────────────────────────────────────────────────────────
 
@@ -380,6 +385,7 @@ export default grammar({
       $.line_comment,
       $.null_statement,
       $.generic_statement,
+      prec(-1, $._mc_tok_inner),
     ),
 
     macro_end: $ => seq(
@@ -499,6 +505,7 @@ export default grammar({
       $.numeric_literal,
       $.macro_variable_ref,
       $.macro_call,
+      $.macro_do_statement,
       $._paren_group,
       /[^();"'&%]+/,
     ),
@@ -613,7 +620,7 @@ export default grammar({
         $.string_literal,
         $.numeric_literal,
         $.macro_variable_ref,
-        /[^;%\/\s"'&]+/,
+        /[^();%\/\s"'&]+/,
         /\//,
       ),
       repeat(choice(

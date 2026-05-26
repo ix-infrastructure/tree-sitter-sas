@@ -1167,6 +1167,14 @@
         {
           "type": "SYMBOL",
           "name": "generic_statement"
+        },
+        {
+          "type": "PREC",
+          "value": -1,
+          "content": {
+            "type": "SYMBOL",
+            "name": "_mc_tok_inner"
+          }
         }
       ]
     },
@@ -1593,6 +1601,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "macro_do_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "_paren_group"
         },
         {
@@ -1908,7 +1920,7 @@
             },
             {
               "type": "PATTERN",
-              "value": "[^;%\\/\\s\"'&]+"
+              "value": "[^();%\\/\\s\"'&]+"
             },
             {
               "type": "PATTERN",
@@ -2147,7 +2159,16 @@
       "name": "percent_comment"
     }
   ],
-  "conflicts": [],
+  "conflicts": [
+    [
+      "generic_statement",
+      "_mc_tok_inner"
+    ],
+    [
+      "macro_call_statement",
+      "macro_call"
+    ]
+  ],
   "precedences": [],
   "externals": [
     {

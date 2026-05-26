@@ -574,3 +574,74 @@ Nested macro if
         (numeric_literal)
         (macro_call_statement
           name: (macro_name))))))
+
+==================
+Macro body paren expression no semicolon
+==================
+
+%macro mdx1(fmt);
+ ((put(DX1,&fmt.) = '1'))
+%mend;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name (identifier))
+    (macro_parameters (identifier))
+    (numeric_literal)
+    (numeric_literal)
+    (macro_variable_ref)
+    (string_literal)
+    (macro_end)))
+
+==================
+Macro body percent-do inside parens
+==================
+
+%macro mdx(fmt);
+ (%do i = 1 %to &ndx.-1;
+  (put(DX&i.,&fmt.) = '1') or
+  %end;
+  (put(DX&ndx.,&fmt.) = '1'))
+%mend;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name (identifier))
+    (macro_parameters (identifier))
+    (macro_do_statement
+      (numeric_literal)
+      (macro_call name: (macro_name))
+      (macro_variable_ref)
+      (numeric_literal)
+      (macro_variable_ref)
+      (macro_variable_ref)
+      (string_literal))
+    (numeric_literal)
+    (macro_variable_ref)
+    (macro_variable_ref)
+    (string_literal)
+    (macro_end)))
+
+==================
+Macro body ending without semicolon
+==================
+
+%macro mdx2q2(fmt);
+ result = 0;
+ if result = 1
+%mend;
+
+---
+
+(program
+  (macro_definition
+    name: (macro_name (identifier))
+    (macro_parameters (identifier))
+    (generic_statement
+      (numeric_literal))
+    (numeric_literal)
+    (macro_end)))
