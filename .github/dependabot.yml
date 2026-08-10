@@ -43,3 +43,13 @@ updates:
     groups:
       python:
         patterns: ["*"]
+
+  # Package.swift + Package.resolved at the root (swift-tree-sitter).
+  - package-ecosystem: swift
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      swift:
+        patterns: ["*"]
