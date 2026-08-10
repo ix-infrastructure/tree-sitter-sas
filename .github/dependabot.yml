@@ -14,8 +14,8 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
-      cargo-minor-patch:
-        update-types: ["minor", "patch"]
+      cargo:
+        patterns: ["*"]
 
   - package-ecosystem: npm
     directory: /
