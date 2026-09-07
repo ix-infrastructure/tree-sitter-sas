@@ -11,3 +11,24 @@ jobs:
       - run: npm ci
       - run: npx tree-sitter generate
       - run: npx tree-sitter test
+
+  # No job compiled Rust before this one. That left the whole cargo side
+  # unverified: `tree-sitter` is a dev-dependency, bindings/rust/build.rs
+  # compiles src/parser.c, and the only Rust check in the repo is a doctest --
+  # none of it ran anywhere. The first thing that built it was `cargo publish`'s
+  # verify step at tag time, post-merge and host-target only.
+  #
+  # That is why the wasm32 breakage this workflow's sibling commit fixes could
+  # exist at all: tree-sitter-language 0.1.8 replaced its wasm libc shims with
+  # bare `#error` files, so any wasm32 build failed, and nothing here noticed.
+  # The wasm32 step is the gate for that, and it needs a real target because the
+  # failure is a C compile error, not a resolution error.
+  cargo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup target add wasm32-unknown-unknown
+      # Exercises the committed src/parser.c through the tree-sitter runtime.
+      - run: cargo test
+      # The path with no host libc, where build.rs takes its wasm branch.
+      - run: cargo build --target wasm32-unknown-unknown

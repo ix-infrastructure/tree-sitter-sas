@@ -5,6 +5,10 @@
 //!
 //! ```
 //! let code = r#"
+//! data work.example;
+//!   set sashelp.class;
+//!   bmi = weight / (height * height);
+//! run;
 //! "#;
 //! let mut parser = tree_sitter::Parser::new();
 //! let language = tree_sitter_sas::LANGUAGE;
@@ -12,10 +16,16 @@
 //!     .set_language(&language.into())
 //!     .expect("Error loading SAS parser");
 //! let tree = parser.parse(code, None).unwrap();
-//! assert!(!tree.root_node().has_error());
+//! let root = tree.root_node();
+//! assert!(!root.has_error());
+//! // Assert the shape, not just the absence of an error: the empty program
+//! // this snippet used to contain parsed to zero named children, so
+//! // `!has_error()` held vacuously and nothing exercised the grammar.
+//! assert_eq!(root.named_child_count(), 1);
+//! assert_eq!(root.named_child(0).unwrap().kind(), "data_step");
 //! ```
 //!
-//! [`Parser`]: https://docs.rs/tree-sitter/0.26.8/tree_sitter/struct.Parser.html
+//! [`Parser`]: https://docs.rs/tree-sitter/0.27.0/tree_sitter/struct.Parser.html
 //! [tree-sitter]: https://tree-sitter.github.io/
 
 use tree_sitter_language::LanguageFn;
