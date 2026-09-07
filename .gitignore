@@ -1,5 +1,9 @@
 # Rust artifacts
 target/
+# Library crate: consumers resolve their own versions, so the lock is not
+# committed. It was not tracked before and a local `cargo test` produces one,
+# which is easy to sweep in with `git add -A`.
+Cargo.lock
 
 # Node artifacts
 build/
