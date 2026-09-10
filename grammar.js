@@ -1,3 +1,5 @@
+// Copyright 2026 Ix Infrastructure INC
+
 /**
  * @file SAS language grammar for tree-sitter
  * @author Brandon Garate <bgarate@ix-infra.com>

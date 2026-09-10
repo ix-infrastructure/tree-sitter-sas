@@ -7,6 +7,7 @@ A [tree-sitter](https://github.com/tree-sitter/tree-sitter) grammar for the [SAS
 [![PyPI](https://img.shields.io/pypi/v/tree-sitter-sas)](https://pypi.org/project/tree-sitter-sas/)
 [![CI](https://github.com/ix-infrastructure/tree-sitter-sas/actions/workflows/ci.yml/badge.svg)](https://github.com/ix-infrastructure/tree-sitter-sas/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2)](https://github.com/sponsors/ix-infrastructure)
 
 ## Node bindings
 

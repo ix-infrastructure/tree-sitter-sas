@@ -1,3 +1,5 @@
+// Copyright 2026 Ix Infrastructure INC
+
 #include "tree_sitter/parser.h"
 #include <stdbool.h>
 
